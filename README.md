@@ -10,6 +10,7 @@ This repository contains Terraform configurations for deploying and managing Api
 ├── apigee-hybrid-core/     # Core Apigee Hybrid infrastructure components
 ├── apigee-on-aks/         # AKS-specific deployment configurations
 ├── apigee-on-gke/         # GKE-specific deployment configurations
+├── apigee-on-eks/         # EKS-specific deployment configurations
 ├── apigee-on-others/      # Install Apigee on other Kubernetes Provider/Access to kubecontext
 └── diagram/               # Architecture diagrams and documentation
 ```
@@ -35,6 +36,8 @@ This repository contains Terraform configurations for deploying and managing Api
 2. Choose your deployment target:
    - For GKE deployment: Navigate to `apigee-on-gke/`
    - For AKS deployment: Navigate to `apigee-on-aks/`
+   - For EKS deployment: Navigate to `apigee-on-eks/`
+   - For other Kubernetes Provider deployment: Navigate to `apigee-on-others/`
 
 3. Initialize Terraform:
    ```bash
