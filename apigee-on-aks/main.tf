@@ -143,7 +143,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "runtime" {
 
   tags = {
     "nodepool-purpose" = "apigee-runtime"
-]   "cloud.google.com/gke-nodepool" = "apigee-runtime" 
+    "cloud.google.com/gke-nodepool" = "apigee-runtime" 
   }
 }
 
