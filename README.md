@@ -23,6 +23,12 @@ This repository contains Terraform configurations for deploying and managing Api
 - gcloud CLI
 - Helm Chart >= 3.15+
 - Access to a GCP project with appropriate permissions
+  - The following organization policies should use Google's default settings:
+    - `disableServiceAccountKeyCreation`
+    - `requireOsLogin`
+    - `requireShieldedVm`
+    - `vmExternalIpAccess`
+
 - For AKS deployments: Azure CLI and access to an Azure subscription
 
 ## Quick Start
