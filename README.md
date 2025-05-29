@@ -75,11 +75,24 @@ Specific configurations for deploying Apigee Hybrid on Google Kubernetes Engine,
 
 Configurations for deploying Apigee Hybrid on Azure Kubernetes Service, including:
 - AKS cluster setup
-- Cross-cloud networking
-- Hybrid connectivity
-- Azure-specific configurations
+- Network configurations
+- Load balancer setup
+- Apigee Runtime Installation
 
 
+### EKS Deployment (`apigee-on-eks/`)
+
+Configurations for deploying Apigee Hybrid on AWS Kubernetes Service, including:
+- EKS cluster setup
+- Network configurations
+- Load balancer setup
+- Apigee Runtime Installation
+
+### Other K8s Deployment (`apigee-on-others/`)
+
+Configurations for deploying Apigee Hybrid on other Kubernetes Service, including:
+
+- Apigee Runtime Installation
 
 ## Maintenance
 
