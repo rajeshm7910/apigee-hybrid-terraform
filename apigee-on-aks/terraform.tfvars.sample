@@ -1,0 +1,25 @@
+# Azure Configuration
+azure_location = "eastus"
+
+# GCP Configuration
+gcp_project_id = "your-gcp-project-id"
+gcp_region     = "us-central1"
+
+# Apigee Configuration
+apigee_org_name      = "your-org-name"  # Typically same as gcp_project_id
+apigee_env_name      = "dev"
+apigee_envgroup_name = "dev-group"      # Changed from 'dev' to avoid conflict with env_name
+apigee_namespace     = "apigee"
+apigee_version       = "1.14.2-hotfix.1"
+
+# Hostnames for Apigee Environment Group
+hostnames = [
+  "api.example.com",
+  "api-dev.example.com"
+]
+
+# Optional: Ingress Service Annotations for Azure Internal Load Balancer
+# ingress_svc_annotations = {
+#   "service.beta.kubernetes.io/azure-load-balancer-internal" = "true"
+#   "service.beta.kubernetes.io/azure-load-balancer-internal-subnet" = "snet-aks-${name_suffix}"
+# } 

@@ -1,0 +1,234 @@
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 3.0" # Consider pinning to a specific minor like "~> 3.75"
+    }
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 4.0" # Consider pinning to a specific minor like "~> 4.80"
+    }
+    random = { # Added for random_string
+      source  = "hashicorp/random"
+      version = "~> 3.5"
+    }
+    local = { # Added for local_file kubeconfig
+      source  = "hashicorp/local"
+      version = "~> 2.4.0"
+    }
+  }
+}
+
+provider "azurerm" {
+  features {}
+}
+
+# Generate random string for resource names
+resource "random_string" "suffix" {
+  length  = 6 # Shortened to avoid hitting length limits on some Azure resources
+  special = false
+  upper   = false
+}
+
+locals {
+  name_suffix = random_string.suffix.result
+  cluster_name = "aks-apigee-${local.name_suffix}"
+  resource_group_name = "rg-apigee-${local.name_suffix}"
+  output_dir = "${path.module}/output" # Define output directory for kubeconfig etc.
+}
+
+# Ensure the output directory exists for kubeconfig
+resource "null_resource" "create_aks_output_dir" {
+  triggers = {
+    output_dir_path = local.output_dir
+  }
+  provisioner "local-exec" {
+    command = "mkdir -p ${local.output_dir}"
+  }
+}
+
+# Create Resource Group
+resource "azurerm_resource_group" "rg" {
+  name     = local.resource_group_name # Use the generated name
+  location = var.azure_location
+}
+
+# Create Virtual Network
+resource "azurerm_virtual_network" "vnet" {
+  name                = "vnet-apigee-${local.name_suffix}"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  address_space       = ["10.0.0.0/16"]
+}
+
+# Create Subnet for AKS
+resource "azurerm_subnet" "aks" {
+  name                 = "snet-aks-${local.name_suffix}"
+  resource_group_name  = azurerm_resource_group.rg.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
+  address_prefixes     = ["10.0.1.0/24"]
+}
+
+# Create NAT Gateway (Optional, but good for outbound internet from AKS)
+resource "azurerm_public_ip" "nat" {
+  name                = "pip-nat-${local.name_suffix}"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  allocation_method   = "Static"
+  sku                 = "Standard"
+}
+
+resource "azurerm_nat_gateway" "nat" {
+  name                = "nat-${local.name_suffix}"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  sku_name            = "Standard"
+}
+
+resource "azurerm_subnet_nat_gateway_association" "aks" {
+  subnet_id      = azurerm_subnet.aks.id
+  nat_gateway_id = azurerm_nat_gateway.nat.id
+}
+
+resource "azurerm_nat_gateway_public_ip_association" "aks_nat_gateway_association" {
+  nat_gateway_id       = azurerm_nat_gateway.nat.id
+  public_ip_address_id = azurerm_public_ip.nat.id
+}
+
+# Create AKS Cluster
+resource "azurerm_kubernetes_cluster" "aks" {
+  name                = local.cluster_name
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  dns_prefix          = "apigee-${local.name_suffix}"
+
+  default_node_pool {
+    name       = "system"
+    node_count = 1 # Min 1 for system
+    vm_size    = "Standard_D4s_v3" # Adjust as needed
+    vnet_subnet_id = azurerm_subnet.aks.id
+    enable_auto_scaling = false
+  }
+
+  network_profile {
+    network_plugin = "azure"
+    network_policy = "azure" # Or "calico"
+    service_cidr   = "10.1.0.0/16"
+    dns_service_ip = "10.1.0.10"
+    outbound_type  = "userAssignedNATGateway" # Using our NAT Gateway
+  }
+
+  identity {
+    type = "SystemAssigned"
+  }
+
+  depends_on = [azurerm_subnet_nat_gateway_association.aks]
+}
+
+# User Node Pool "apigee-runtime"
+resource "azurerm_kubernetes_cluster_node_pool" "runtime" {
+  name                  = "apigeerun"
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
+  vm_size               = "Standard_D4s_v3"
+  min_count             = var.runtime_pool_enable_autoscaling ? var.runtime_pool_min_count : null
+  max_count             = var.runtime_pool_enable_autoscaling ? var.runtime_pool_max_count : null
+  enable_auto_scaling   = var.runtime_pool_enable_autoscaling
+  node_count            = var.runtime_pool_enable_autoscaling ? null : var.runtime_pool_node_count # Set node_count to null if autoscaling is enabled
+ 
+  vnet_subnet_id        = azurerm_subnet.aks.id
+  os_disk_size_gb       = 128
+  os_type               = "Linux"
+  mode                  = "User"
+  zones                 = ["1", "2"]
+
+  tags = {
+    "nodepool-purpose" = "apigee-runtime"
+    "environment"      = "hybrid-test"
+  }
+}
+
+# User Node Pool "apigee-data"
+resource "azurerm_kubernetes_cluster_node_pool" "data" {
+  name                  = "apigeedata"
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
+  vm_size               = "Standard_D4s_v3"
+  min_count             = var.data_pool_enable_autoscaling ? var.data_pool_min_count : null
+  max_count             = var.data_pool_enable_autoscaling ? var.data_pool_max_count : null
+  enable_auto_scaling   = var.data_pool_enable_autoscaling
+  node_count            = var.data_pool_enable_autoscaling ? null : var.data_pool_node_count
+
+  vnet_subnet_id        = azurerm_subnet.aks.id
+  os_disk_size_gb       = 128
+  os_type               = "Linux"
+  mode                  = "User"
+  zones                 = ["1"]
+
+  tags = {
+    "nodepool-purpose" = "apigee-data"
+    "environment"      = "hybrid-test"
+  }
+}
+
+
+resource "null_resource" "cluster_setup" {
+  # Use local-exec provisioner to run a script to configure kubectl
+  provisioner "local-exec" {
+    command = "az aks get-credentials --resource-group ${local.resource_group_name} --name ${local.cluster_name} --overwrite-existing"
+  }
+  depends_on = [
+    azurerm_kubernetes_cluster_node_pool.runtime,
+    azurerm_kubernetes_cluster_node_pool.data,
+    azurerm_kubernetes_cluster.aks,
+  ]
+}
+
+
+# Call the apigee-hybrid-core module
+# This module will now handle the setup script execution if var.apigee_install is true
+module "apigee_core" { # Renamed module instance for clarity
+  source = "../apigee-hybrid-core" # Adjust path as needed
+
+  project_id                  = var.gcp_project_id
+  region                      = var.gcp_region # Core module expects 'region'
+  apigee_org_name             = var.apigee_org_name # Passed to core, core decides how to use it (e.g. for overrides or display name)
+  apigee_org_display_name     = "Apigee Org for ${var.gcp_project_id} on AKS" # Or pass var.apigee_org_name
+  apigee_env_name             = var.apigee_env_name
+  apigee_envgroup_name        = var.apigee_envgroup_name
+  apigee_envgroup_hostnames   = var.hostnames # Core module expects 'apigee_envgroup_hostnames'
+  apigee_instance_name        = "aks-${local.name_suffix}" # A name for the Apigee instance resource
+  cluster_name                = local.cluster_name         # Pass AKS cluster name to core module
+  apigee_version              = var.apigee_version
+  apigee_namespace            = var.apigee_namespace
+  apigee_cassandra_replica_count = 1 # For non-prod, adjust for prod (min 3)
+
+  create_org     = true # Set to true if you want this module to create the Apigee Org
+  apigee_install = true # Set to true to run the setup_apigee.sh script from core module
+
+  # Template paths can be omitted if using defaults in core module (${path.module}/<template-name>)
+  overrides_template_path = "${path.module}/../apigee-hybrid-core/overrides-templates.yaml" # Example if you want to be explicit
+  service_template_path   = "${path.module}/../apigee-hybrid-core/apigee-service-template.yaml" # Example
+
+  # Pass annotations if needed for Azure internal load balancer for ingress
+  # ingress_svc_annotations = {
+  #   "service.beta.kubernetes.io/azure-load-balancer-internal": "true"
+  #   # "service.beta.kubernetes.io/azure-load-balancer-internal-subnet": "snet-aks-${local.name_suffix}" # If specific subnet
+  # }
+
+  depends_on = [
+    azurerm_kubernetes_cluster.aks, # Ensure AKS is ready before Apigee core module attempts anything K8s related
+    azurerm_kubernetes_cluster_node_pool.runtime,
+    azurerm_kubernetes_cluster_node_pool.data,
+    null_resource.cluster_setup, # Ensure cluster setup is done before Apigee install
+  ]
+}
+
+# Generate kubeconfig
+resource "local_file" "kubeconfig" {
+  content  = azurerm_kubernetes_cluster.aks.kube_config_raw
+  filename = "${local.output_dir}/kubeconfig"
+
+  depends_on = [
+    azurerm_kubernetes_cluster.aks,
+    null_resource.create_aks_output_dir,
+    ]
+}
