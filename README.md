@@ -10,6 +10,7 @@ This repository contains Terraform configurations for deploying and managing Api
 ├── apigee-hybrid-core/     # Core Apigee Hybrid infrastructure components
 ├── apigee-on-aks/         # AKS-specific deployment configurations
 ├── apigee-on-gke/         # GKE-specific deployment configurations
+├── apigee-on-others/      # Install Apigee on other Kubernetes Provider/Access to kubecontext
 └── diagram/               # Architecture diagrams and documentation
 ```
 
