@@ -49,10 +49,10 @@ nodeSelector:
   requiredForScheduling: false
   apigeeRuntime:
     key: "cloud.google.com/gke-nodepool"
-    value: "apigeerun"
+    value: "apigee-runtime"
   apigeeData:
     key: "cloud.google.com/gke-nodepool"
-    value: "apigeedata"
+    value: "apigee-data"
 
 
 ingressGateways:

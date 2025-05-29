@@ -121,7 +121,7 @@ data "google_compute_zones" "available" {
 
 # Create Node Pool for Runtime
 resource "google_container_node_pool" "runtime" {
-  name       = "apigeerun"
+  name       = "apigee-runtime"
   location   = var.region
   cluster    = google_container_cluster.gke.name
   node_count = 1
@@ -146,7 +146,7 @@ resource "google_container_node_pool" "runtime" {
 
 # Create Node Pool for Data
 resource "google_container_node_pool" "data" {
-  name       = "apigeedata"
+  name       = "apigee-data"
   location   = var.region
   cluster    = google_container_cluster.gke.name
   node_count = 1

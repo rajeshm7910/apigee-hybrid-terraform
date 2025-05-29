@@ -143,7 +143,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "runtime" {
 
   tags = {
     "nodepool-purpose" = "apigee-runtime"
-    "environment"      = "hybrid-test"
+]   "cloud.google.com/gke-nodepool" = "apigee-runtime" 
   }
 }
 
@@ -165,7 +165,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "data" {
 
   tags = {
     "nodepool-purpose" = "apigee-data"
-    "environment"      = "hybrid-test"
+    "cloud.google.com/gke-nodepool" = "apigee-data"
   }
 }
 

@@ -1,0 +1,38 @@
+#EKS Specific Configuration
+eks_region = "us-west-1"
+
+# GCP Configuration
+project_id = "your-gcp-project-id"
+region     = "us-west1"
+
+# Apigee Configuration
+apigee_org_name          = "your-org-name"
+apigee_env_name          = "dev"
+apigee_envgroup_name     = "dev-group"
+apigee_namespace         = "apigee"
+cluster_name             = "apigee"
+apigee_version           = "1.14.2-hotfix.1"
+apigee_org_display_name  = "My Apigee Organization"
+apigee_env_display_name  = "Development Environment"
+apigee_instance_name     = "apigee-instance"
+apigee_cassandra_replica_count = 3
+
+# Hostnames for Apigee Environment Group
+hostnames = [
+  "api.example.com",
+  "api-dev.example.com"
+]
+
+# Ingress Configuration
+ingress_name = "apigee-ingress"
+ingress_svc_annotations = {
+  # "service.beta.kubernetes.io/aws-load-balancer-type" = "nlb"
+  # "service.beta.kubernetes.io/aws-load-balancer-internal" = "true"
+}
+
+# Optional: Paths to template files if you want to use custom templates
+# overrides_template_path = "path/to/overrides-template.yaml"
+# service_template_path   = "path/to/service-template.yaml"
+
+# Billing Configuration
+billing_type = "EVALUATION"  # or "PAID" 
