@@ -95,8 +95,8 @@ module "eks" {
         "cloud.google.com/gke-nodepool" = "apigee-data"
       }
       labels = {
-        "nodepool-purpose"            = "apigee-runtime"
-        "cloud.google.com/gke-nodepool" = "apigee-runtime"
+        "nodepool-purpose"            = "apigee-data"
+        "cloud.google.com/gke-nodepool" = "apigee-data"
       }
     }
   }
