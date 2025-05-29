@@ -141,9 +141,13 @@ resource "azurerm_kubernetes_cluster_node_pool" "runtime" {
   mode                  = "User"
   zones                 = ["1", "2"]
 
+  node_labels = {
+    "nodepool-purpose"            = "apigee-runtime"
+    "cloud.google.com/gke-nodepool" = "apigee-runtime"
+  }
+  # Add tags to the node pool
   tags = {
-    "nodepool-purpose" = "apigee-runtime"
-    "cloud.google.com/gke-nodepool" = "apigee-runtime" 
+    "nodepool-purpose" = "apigee-runtime" 
   }
 }
 
@@ -163,9 +167,13 @@ resource "azurerm_kubernetes_cluster_node_pool" "data" {
   mode                  = "User"
   zones                 = ["1"]
 
+  node_labels = {
+    "nodepool-purpose"            = "apigee-data"
+    "cloud.google.com/gke-nodepool" = "apigee-data"
+  }
+
   tags = {
     "nodepool-purpose" = "apigee-data"
-    "cloud.google.com/gke-nodepool" = "apigee-data"
   }
 }
 

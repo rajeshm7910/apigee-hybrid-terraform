@@ -77,6 +77,10 @@ module "eks" {
       tags = {
         "cloud.google.com/gke-nodepool" = "apigee-runtime" 
       }
+      labels = {
+        "nodepool-purpose"            = "apigee-runtime"
+        "cloud.google.com/gke-nodepool" = "apigee-runtime"
+      }
     }
 
     two = {
@@ -89,6 +93,10 @@ module "eks" {
       desired_size = 1
       tags = {
         "cloud.google.com/gke-nodepool" = "apigee-data"
+      }
+      labels = {
+        "nodepool-purpose"            = "apigee-runtime"
+        "cloud.google.com/gke-nodepool" = "apigee-runtime"
       }
     }
   }

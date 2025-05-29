@@ -248,8 +248,6 @@ resource "google_apigee_organization" "apigee_org" {
   ]
 }
 
-
-
 resource "google_apigee_environment" "hybrid_env" {
   # count = var.create_org ? 1 : 0 # Or a more specific var.create_environment
   name         = local.effective_env_name
@@ -349,17 +347,18 @@ resource "null_resource" "apigee_setup_execution" {
     apigee_namespace              = var.apigee_namespace
     apigee_overrides_yaml_content = local_file.apigee_overrides.content
     apigee_service_yaml_content   = local_file.apigee_service.content
-    # Using file paths as triggers ensures script re-runs if file locations change (though content trigger is stronger)
-    apigee_sa_key_json_path   = abspath(local_file.apigee_non_prod_sa_key_file.filename)
-    apigee_envgroup_cert_path = abspath(local_file.apigee_envgroup_cert_file.filename)
-    apigee_envgroup_key_path  = abspath(local_file.apigee_envgroup_private_key_file.filename)
-    script_hash               = filemd5("${path.module}/setup_apigee.sh") # Re-run if script changes
-    # Add a trigger based on a variable from the calling module that indicates K8s is ready, if needed.
-    # For example, pass aks_cluster_id = azurerm_kubernetes_cluster.aks.id to this module and add it to triggers.
-    # This ensures this resource is re-evaluated when the cluster ID changes.
-    # The actual dependency is handled by Terraform's graph based on module input.
+    apigee_sa_key_json_path       = abspath(local_file.apigee_non_prod_sa_key_file.filename)
+    apigee_envgroup_cert_path     = abspath(local_file.apigee_envgroup_cert_file.filename)
+    apigee_envgroup_key_path      = abspath(local_file.apigee_envgroup_private_key_file.filename)
+    script_hash                   = filemd5("${path.module}/setup_apigee.sh")
+    output_dir                    = local.output_dir
   }
 
+  provisioner "local-exec" {
+    when = destroy
+    command = "kubectl delete -f ${self.triggers.output_dir}/apigee-service.yaml"
+  }
+  
   provisioner "local-exec" {
     command = <<-EOT
       bash ${path.module}/setup_apigee.sh \
@@ -374,12 +373,9 @@ resource "null_resource" "apigee_setup_execution" {
   }
 
   depends_on = [
-    # GCP Resources
-    google_apigee_envgroup_attachment.env_to_group_attachment, # Depends on the whole chain
-    # Local files
+    google_apigee_envgroup_attachment.env_to_group_attachment,
     local_file.apigee_overrides,
     local_file.apigee_service,
-    # SA Key and Certs are implicitly depended upon by apigee_overrides, but explicit here is fine
     local_file.apigee_non_prod_sa_key_file,
     local_file.apigee_envgroup_cert_file,
     local_file.apigee_envgroup_private_key_file,
