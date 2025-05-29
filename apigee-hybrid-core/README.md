@@ -1,20 +1,20 @@
 
 ## Apigee Hybrid Setup Script
 
-The `setup_apigee.sh` script automates the installation and configuration of Apigee Hybrid on Azure AKS. It handles the deployment of all necessary components including the operator, datastore, telemetry, and ingress configurations.
+The `setup_apigee.sh` script automates the installation and configuration of Apigee Hybrid. It handles the deployment of all necessary components including the operator, datastore, telemetry, and ingress configurations.
 
 ### Prerequisites
 
 Before running the script, ensure you have:
 
-1. Access to a running AKS cluster
+1. Access to a running Kubernetes cluster
 2. Required files:
    - `overrides.yaml`: Apigee configuration overrides
    - `service.yaml`: Service template configuration
    - Service account key JSON file
    - TLS certificate and private key for environment group
 3. Required tools:
-   - `kubectl` configured to access your AKS cluster
+   - `kubectl` configured to access your Kubernetes cluster
    - `helm` (version 3.10+)
    - `gcloud` CLI configured with appropriate permissions
 
