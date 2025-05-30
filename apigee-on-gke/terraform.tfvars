@@ -1,21 +1,17 @@
-#EKS Specific Configuration
-eks_region = "us-west-1"
-
 # GCP Configuration
-project_id = "your-gcp-project-id"
-region     = "us-west1"
+project_id = "apigee-gke-example3"
+region     = "us-central1"
 
 # Apigee Configuration
-apigee_org_name          = "your-org-name"
+apigee_org_name          = "apigee-gke-example3" #Same as Projectid
 apigee_env_name          = "dev"
 apigee_envgroup_name     = "dev-group"
 apigee_namespace         = "apigee"
-cluster_name             = "apigee"
 apigee_version           = "1.14.2-hotfix.1"
-apigee_org_display_name  = "My Apigee Organization"
+apigee_org_display_name  = "Apigee GKE Example Organization"
 apigee_env_display_name  = "Development Environment"
 apigee_instance_name     = "apigee-instance"
-apigee_cassandra_replica_count = 1
+apigee_cassandra_replica_count = 3
 
 # Hostnames for Apigee Environment Group
 hostnames = [
@@ -23,15 +19,15 @@ hostnames = [
   "api-dev.example.com"
 ]
 
-create_org=true
-apigee_install=true
-
 # Ingress Configuration
 ingress_name = "apigee-ingress"
 ingress_svc_annotations = {
-  # "service.beta.kubernetes.io/aws-load-balancer-type" = "nlb"
-  # "service.beta.kubernetes.io/aws-load-balancer-internal" = "true"
+  # "cloud.google.com/neg" = "{\"ingress\": true}"
+  # "cloud.google.com/load-balancer-type" = "Internal"
 }
+
+create_org=false
+apigee_install=true
 
 # Optional: Paths to template files if you want to use custom templates
 # overrides_template_path = "path/to/overrides-template.yaml"
