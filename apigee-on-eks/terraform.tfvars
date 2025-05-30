@@ -51,28 +51,3 @@ ingress_svc_annotations = {
 billing_type = "EVALUATION"  # Options: "EVALUATION" or "PAID"
 # Note: For production use, set this to "PAID"
 
-# AWS-specific configurations
-aws_region = "us-west-2"  # AWS region for resources
-vpc_cidr   = "10.0.0.0/16"
-subnet_cidrs = {
-  private = ["10.0.1.0/24", "10.0.2.0/24"]
-  public  = ["10.0.101.0/24", "10.0.102.0/24"]
-}
-
-# EKS Node Group Configuration
-node_groups = {
-  runtime = {
-    desired_size = 2
-    min_size     = 1
-    max_size     = 4
-    instance_type = "t3.xlarge"  # 4 vCPU, 16 GB memory
-    disk_size    = 100
-  }
-  data = {
-    desired_size = 2
-    min_size     = 1
-    max_size     = 4
-    instance_type = "t3.xlarge"  # 4 vCPU, 16 GB memory
-    disk_size    = 100
-  }
-} 
