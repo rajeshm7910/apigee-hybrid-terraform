@@ -17,6 +17,14 @@ resource "random_string" "suffix" {
   length  = 8
   special = false
   upper   = false
+  # Add this keepers block
+  keepers = {
+    # This key can be anything, e.g., "static_suffix_trigger"
+    # As long as the value "1" (or any static value) doesn't change,
+    # the random string will only be generated once and then stored.
+    # If you ever need to force a new suffix, change this value.
+    _ = "1"
+  }
 }
 
 locals {
@@ -109,22 +117,20 @@ resource "google_container_cluster" "gke" {
   node_config {
     tags = ["nat-route"]
   }
-}
-
-data "google_compute_zones" "available" {
-  project = var.project_id
-  region  = var.region
-  # Optional: You can filter zones if needed, e.g., by status
-  # status = "UP"
+  lifecycle {
+    ignore_changes = [
+      initial_node_count,
+      ]
+  }
 }
 
 
 # Create Node Pool for Runtime
 resource "google_container_node_pool" "runtime" {
-  name       = "apigee-runtime"
-  location   = var.region
-  cluster    = google_container_cluster.gke.name
-  node_count = 1
+  name         = "apigee-runtime"
+  location     = var.region
+  cluster      = google_container_cluster.gke.name
+  node_count   = 1
 
   node_config {
     machine_type = "e2-standard-4"
@@ -133,24 +139,26 @@ resource "google_container_node_pool" "runtime" {
 
     labels = {
       "apigee-runtime" = "true"
+      "temp-update-trigger" = "true" # Add this line
     }
-
     tags = ["apigee-runtime", "nat-route"]
+    
   }
-
   management {
     auto_repair  = true
     auto_upgrade = true
+  }
+  lifecycle {
+      ignore_changes = all
   }
 }
 
 # Create Node Pool for Data
 resource "google_container_node_pool" "data" {
-  name       = "apigee-data"
-  location   = var.region
-  cluster    = google_container_cluster.gke.name
-  node_count = 1
-  # Specify the zone for the node pool, using the first available zone
+  name         = "apigee-data"
+  location     = var.region
+  cluster      = google_container_cluster.gke.name
+  node_count   = 1
 
   node_config {
     machine_type = "e2-standard-4"
@@ -159,15 +167,19 @@ resource "google_container_node_pool" "data" {
 
     labels = {
       "apigee-data" = "true"
+      "temp-update-trigger" = "true" # Add this line
     }
-
     tags = ["apigee-data", "nat-route"]
+    
   }
-
   management {
     auto_repair  = true
     auto_upgrade = true
   }
+  lifecycle {
+      ignore_changes = all
+  }
+
 }
 
 # Generate kubeconfig

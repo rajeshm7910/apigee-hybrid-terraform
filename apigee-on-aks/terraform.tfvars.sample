@@ -6,17 +6,27 @@ gcp_project_id = "your-gcp-project-id"
 gcp_region     = "us-central1"
 
 # Apigee Configuration
-apigee_org_name      = "your-org-name"  # Typically same as gcp_project_id
-apigee_env_name      = "dev"
-apigee_envgroup_name = "dev-group"      # Changed from 'dev' to avoid conflict with env_name
-apigee_namespace     = "apigee"
-apigee_version       = "1.14.2-hotfix.1"
+
+apigee_org_name          = "your-org-name"
+apigee_env_name          = "dev"
+apigee_envgroup_name     = "dev-group"
+apigee_namespace         = "apigee"
+apigee_version           = "1.14.2-hotfix.1"
+apigee_org_display_name  = "My Apigee Organization"
+apigee_env_display_name  = "Development Environment"
+apigee_instance_name     = "apigee-instance"
+apigee_cassandra_replica_count = 1
+
 
 # Hostnames for Apigee Environment Group
 hostnames = [
   "api.example.com",
   "api-dev.example.com"
 ]
+
+create_org=true
+apigee_install=true
+
 
 # Optional: Ingress Service Annotations for Azure Internal Load Balancer
 # ingress_svc_annotations = {

@@ -11,7 +11,8 @@ usage() {
     echo "  -v, --version VERSION       Apigee version (default: $APIGEE_VERSION)"
     echo "  -n, --namespace NAMESPACE   Apigee namespace (default: $APIGEE_NAMESPACE)"
     echo "  -o, --overrides PATH        Path to overrides.yaml file (required)"
-    echo "  -s, --service PATH          Path to service template file (required)"
+    echo "  -s, --service PATH          Path to apigee service template file (required)"
+    echo "  -a, --sa_email SA_EMAIL      Path to apigee service accounts template file (required)"
     echo "  -k, --key PATH              Path to service account key JSON file (required)"
     echo "  -c, --cert PATH             Path to environment group certificate file (required)"
     echo "  -p, --private-key PATH      Path to environment group private key file (required)"
@@ -38,6 +39,10 @@ while [[ $# -gt 0 ]]; do
             SERVICE_TEMPLATE_PATH="$2"
             shift 2
             ;;
+        -a|--sa_email)
+            SA_EMAIL="$2"
+            shift 2
+            ;;
         -k|--key)
             SA_KEY_JSON_PATH="$2"
             shift 2
@@ -60,8 +65,9 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+
 # Validate required parameters
-if [ -z "$OVERRIDES_YAML_PATH" ] || [ -z "$SERVICE_TEMPLATE_PATH" ] || \
+if [ -z "$OVERRIDES_YAML_PATH" ] || [ -z "$SERVICE_TEMPLATE_PATH" ] || [ -z "$SA_EMAIL" ] || \
    [ -z "$SA_KEY_JSON_PATH" ] || [ -z "$ENVGROUP_CERT_PATH" ] || \
    [ -z "$ENVGROUP_PRIVATE_KEY_PATH" ]; then
     echo "Error: Missing required parameters"
@@ -171,14 +177,14 @@ enable_control_plane_access() {
     curl -X PATCH -H "Authorization: Bearer $TOKEN" \
     -H "Content-Type:application/json" \
     "https://apigee.googleapis.com/v1/organizations/$org_name/controlPlaneAccess?update_mask=synchronizer_identities" \
-    -d "{\"synchronizer_identities\": [\"serviceAccount:apigee-non-prod@$org_name.iam.gserviceaccount.com\"]}"
+    -d "{\"synchronizer_identities\": [\"serviceAccount:$SA_EMAIL\"]}"
     
     sleep 5
 
     curl -X  PATCH -H "Authorization: Bearer $TOKEN" \
     -H "Content-Type:application/json" \
     "https://apigee.googleapis.com/v1/organizations/$org_name/controlPlaneAccess?update_mask=analytics_publisher_identities" \
-    -d "{\"analytics_publisher_identities\": [\"serviceAccount:apigee-non-prod@$org_name.iam.gserviceaccount.com\"]}"
+    -d "{\"analytics_publisher_identities\": [\"serviceAccount:$SA_EMAIL\"]}"
 
 }
 

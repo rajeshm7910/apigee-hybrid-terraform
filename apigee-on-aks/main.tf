@@ -28,6 +28,13 @@ resource "random_string" "suffix" {
   length  = 6 # Shortened to avoid hitting length limits on some Azure resources
   special = false
   upper   = false
+  keepers = {
+    # This key can be anything, e.g., "static_suffix_trigger"
+    # As long as the value "1" (or any static value) doesn't change,
+    # the random string will only be generated once and then stored.
+    # If you ever need to force a new suffix, change this value.
+    _ = "1"
+  }
 }
 
 locals {
@@ -177,6 +184,21 @@ resource "azurerm_kubernetes_cluster_node_pool" "data" {
   }
 }
 
+# Data source to retrieve the built-in "Network Contributor" role definition
+data "azurerm_role_definition" "network_contributor" {
+  name = "Network Contributor"
+}
+
+# Assign the "Network Contributor" role to the AKS cluster's SystemAssigned Managed Identity
+# on the subnet scope. This grants the AKS identity permission to join the subnet.
+resource "azurerm_role_assignment" "aks_subnet_join_permission" {
+  scope                = azurerm_subnet.aks.id
+  role_definition_id   = data.azurerm_role_definition.network_contributor.id
+  principal_id         = azurerm_kubernetes_cluster.aks.identity[0].principal_id # Correctly reference the AKS cluster's SystemAssigned Identity
+  skip_service_principal_aad_check = true # Essential for Managed Identities
+}
+
+
 
 resource "null_resource" "cluster_setup" {
   # Use local-exec provisioner to run a script to configure kubectl
@@ -187,6 +209,7 @@ resource "null_resource" "cluster_setup" {
     azurerm_kubernetes_cluster_node_pool.runtime,
     azurerm_kubernetes_cluster_node_pool.data,
     azurerm_kubernetes_cluster.aks,
+    azurerm_role_assignment.aks_subnet_join_permission # Add dependency here
   ]
 }
 
@@ -199,7 +222,7 @@ module "apigee_core" { # Renamed module instance for clarity
   project_id                  = var.gcp_project_id
   region                      = var.gcp_region # Core module expects 'region'
   apigee_org_name             = var.apigee_org_name # Passed to core, core decides how to use it (e.g. for overrides or display name)
-  apigee_org_display_name     = "Apigee Org for ${var.gcp_project_id} on AKS" # Or pass var.apigee_org_name
+  apigee_org_display_name     = var.apigee_org_display_name
   apigee_env_name             = var.apigee_env_name
   apigee_envgroup_name        = var.apigee_envgroup_name
   apigee_envgroup_hostnames   = var.hostnames # Core module expects 'apigee_envgroup_hostnames'
@@ -207,10 +230,14 @@ module "apigee_core" { # Renamed module instance for clarity
   cluster_name                = local.cluster_name         # Pass AKS cluster name to core module
   apigee_version              = var.apigee_version
   apigee_namespace            = var.apigee_namespace
-  apigee_cassandra_replica_count = 1 # For non-prod, adjust for prod (min 3)
+  apigee_cassandra_replica_count = var.apigee_cassandra_replica_count
 
-  create_org     = true # Set to true if you want this module to create the Apigee Org
-  apigee_install = true # Set to true to run the setup_apigee.sh script from core module
+
+  ingress_name                = var.ingress_name
+  ingress_svc_annotations     = var.ingress_svc_annotations
+
+  create_org                  = var.create_org # Set to true if you want this module to create the Apigee Org
+  apigee_install              = var.apigee_install # Set to true to run the setup_apigee.sh script from core module
 
   # Template paths can be omitted if using defaults in core module (${path.module}/<template-name>)
   overrides_template_path = "${path.module}/../apigee-hybrid-core/overrides-templates.yaml" # Example if you want to be explicit

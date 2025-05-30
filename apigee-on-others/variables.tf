@@ -52,7 +52,7 @@ variable "hostnames" {
 variable "create_org" {
   description = "Whether to create a new Apigee organization"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "apigee_org_display_name" {
@@ -106,7 +106,7 @@ variable "service_template_path" {
 variable "apigee_install" {
   description = "Whether to install Apigee components"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "billing_type" {

@@ -22,14 +22,18 @@ This repository contains Terraform configurations for deploying and managing Api
 - kubectl
 - gcloud CLI
 - Helm Chart >= 3.15+
-- Access to a GCP project with appropriate permissions
+- Access to a GCP project with appropriate permissions (Owner/Edior)
   - The following organization policies should use Google's default settings:
     - `disableServiceAccountKeyCreation`
     - `requireOsLogin`
     - `requireShieldedVm`
     - `vmExternalIpAccess`
+- Ensure that it doesn't have service account with prefix apigee-non-prod@<project_id>
 
 - For AKS deployments: Azure CLI and access to an Azure subscription
+- For EKS deployments: AWS CLI and access to an AWS Keys
+- For GKE deployments: gcloud tools and access to projects
+
 
 ## Quick Start
 

@@ -22,9 +22,20 @@ terraform {
   }
 }
 
+# Generate random string for resource names
+resource "random_string" "suffix" {
+  length  = 6 # Shortened to avoid hitting length limits on some Azure resources
+  special = false
+  upper   = false
+  keepers = { 
+    _ = "1"
+  }
+}
+
 locals {
+  random_suffix = substr(random_string.suffix.result, 0, 6)
   apigee_org_constructed_id = "organizations/${var.project_id}" # Apigee Org ID is the Project ID
-  service_account_id_short  = "apigee-non-prod" # Or make this configurable
+  service_account_id_short  = "apigee-non-prod-${local.random_suffix}" # Or make this configurable
   service_account_email     = "${local.service_account_id_short}@${var.project_id}.iam.gserviceaccount.com"
 
   effective_org_id = var.create_org ? (
@@ -36,11 +47,9 @@ locals {
   effective_envgroup_hostnames = var.apigee_envgroup_hostnames
   effective_envgroup_name      = var.apigee_envgroup_name
 
-  effective_envgroup_id = var.create_org ? ( # This assumes envgroup is created only if org is created by this module
-    google_apigee_envgroup.hybrid_envgroup.id
+  effective_envgroup_id = var.create_org ? (
+    google_apigee_envgroup.hybrid_envgroup[0].id
   ) : (local.effective_org_id != null ? "${local.effective_org_id}/envgroups/${var.apigee_envgroup_name}" : null)
-  # A more robust way if org might exist but envgroup needs creation:
-  # effective_envgroup_id = try(google_apigee_envgroup.hybrid_envgroup.id, "${local.effective_org_id}/envgroups/${var.apigee_envgroup_name}")
 
   apigee_non_prod_sa_roles = [
     "roles/storage.objectAdmin",
@@ -249,15 +258,17 @@ resource "google_apigee_organization" "apigee_org" {
 }
 
 resource "google_apigee_environment" "hybrid_env" {
-  # count = var.create_org ? 1 : 0 # Or a more specific var.create_environment
+  count = var.create_org ? 1 : 0
+
   name         = local.effective_env_name
   display_name = var.apigee_env_display_name
   description  = "Hybrid Environment for ${local.effective_env_name}"
   org_id       = local.effective_org_id
-
 }
 
 resource "google_apigee_envgroup" "hybrid_envgroup" {
+  count = var.create_org ? 1 : 0
+
   name      = local.effective_envgroup_name
   hostnames = local.effective_envgroup_hostnames
   org_id    = local.effective_org_id
@@ -269,9 +280,10 @@ resource "google_apigee_envgroup" "hybrid_envgroup" {
 }
 
 resource "google_apigee_envgroup_attachment" "env_to_group_attachment" {
-  # count = var.create_org ? 1 : 0 # Or a more specific var.create_attachment
-  envgroup_id = google_apigee_envgroup.hybrid_envgroup.id # Use direct reference
-  environment = google_apigee_environment.hybrid_env.name # Use direct reference
+  count = var.create_org ? 1 : 0
+
+  envgroup_id = google_apigee_envgroup.hybrid_envgroup[0].id
+  environment = google_apigee_environment.hybrid_env[0].name
 
   depends_on = [
     google_apigee_environment.hybrid_env,
@@ -281,11 +293,6 @@ resource "google_apigee_envgroup_attachment" "env_to_group_attachment" {
 # ------------------------------------------------------------------------------
 # Generate overrides.yaml and apigee-service.yaml
 # ------------------------------------------------------------------------------
-# The random_id is not strictly necessary for instance_id in overrides if var.apigee_instance_name is sufficient.
-# If you need a truly unique component ID for some internal Apigee purpose, you can use it.
-# resource "random_id" "apigee_component_id" {
-#   byte_length = 8
-# }
 
 resource "local_file" "apigee_overrides" {
   content = templatefile(local.final_overrides_template_path, {
@@ -357,6 +364,7 @@ resource "null_resource" "apigee_setup_execution" {
   provisioner "local-exec" {
     when = destroy
     command = "kubectl delete -f ${self.triggers.output_dir}/apigee-service.yaml"
+    on_failure = continue
   }
   
   provisioner "local-exec" {
@@ -364,6 +372,7 @@ resource "null_resource" "apigee_setup_execution" {
       bash ${path.module}/setup_apigee.sh \
         --version "${var.apigee_version}" \
         --namespace "${var.apigee_namespace}" \
+        --sa_email "${local.service_account_email}" \
         --overrides "${abspath(local_file.apigee_overrides.filename)}" \
         --service "${abspath(local_file.apigee_service.filename)}" \
         --key "${abspath(local_file.apigee_non_prod_sa_key_file.filename)}" \

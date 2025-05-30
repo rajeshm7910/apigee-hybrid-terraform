@@ -21,6 +21,13 @@ locals {
 resource "random_string" "suffix" {
   length  = 8
   special = false
+  keepers = {
+    # This key can be anything, e.g., "static_suffix_trigger"
+    # As long as the value "1" (or any static value) doesn't change,
+    # the random string will only be generated once and then stored.
+    # If you ever need to force a new suffix, change this value.
+    _ = "1"
+  }
 }
 
 module "vpc" {
@@ -53,7 +60,7 @@ module "eks" {
   version = "20.8.5"
 
   cluster_name    = local.cluster_name
-  cluster_version = "1.29"
+  cluster_version = "1.31"
 
   cluster_endpoint_public_access           = true
   enable_cluster_creator_admin_permissions = true

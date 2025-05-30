@@ -20,6 +20,9 @@ hostnames = [
   "api-dev.example.com"
 ]
 
+create_org=true
+apigee_install=true
+
 # Ingress Configuration
 ingress_name = "apigee-ingress"
 ingress_svc_annotations = {

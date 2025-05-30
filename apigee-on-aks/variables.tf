@@ -116,3 +116,43 @@ variable "ingress_svc_annotations" {
   type        = map(string)
   default     = {}
 }
+
+variable "ingress_name" {
+  description = "The name of the ingress resource for Apigee"
+  type        = string
+  default     = "apigee-ingress"
+}
+
+variable "apigee_org_display_name" {
+  description = "The display name for the Apigee organization"
+  type        = string
+  default     = ""
+}
+
+variable "apigee_cassandra_replica_count" {
+  description = "Number of Cassandra replicas for Apigee"
+  type        = number
+  default     = 3
+}
+
+variable "create_org" {
+  description = "Whether to create a new Apigee organization"
+  type        = bool
+  default     = true
+}
+
+variable "apigee_install" {
+  description = "Whether to run the Apigee installation script"
+  type        = bool
+  default     = true
+}
+
+variable "billing_type" {
+  description = "The billing type for the Apigee organization (EVALUATION or PAID)"
+  type        = string
+  default     = "EVALUATION"
+  validation {
+    condition     = contains(["EVALUATION", "PAID"], var.billing_type)
+    error_message = "Billing type must be either EVALUATION or PAID."
+  }
+}

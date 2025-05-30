@@ -5,7 +5,7 @@ region     = "us-central1"
 # Apigee Configuration
 apigee_org_name          = "your-org-name"
 apigee_env_name          = "dev"
-apigee_envgroup_name     = "dev"
+apigee_envgroup_name     = "dev-group"
 apigee_namespace         = "apigee"
 apigee_version           = "1.14.2-hotfix.1"
 apigee_org_display_name  = "My Apigee Organization"
@@ -18,6 +18,10 @@ hostnames = [
   "api.example.com",
   "api-dev.example.com"
 ]
+
+create_org=true
+apigee_install=true
+
 
 # Ingress Configuration
 ingress_name = "apigee-ingress"
