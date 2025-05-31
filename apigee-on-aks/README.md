@@ -47,7 +47,7 @@ Once the terraform provisions the aks infrastructure, it proceeds to create Apig
 5.  **Download and install Helm** (version 3.10+ recommended, check Apigee docs for specific version compatibility).
 6.  Run `terraform init` to initialize Terraform and download necessary providers.
 
-## Pre-Cluster Setup Steps
+## Setup Steps
 
 1.  **Authenticate with Azure**:
     *   **Interactive Login (User Account)**: Run `az login`. This command will open a browser for authentication. The Azure CLI will then store your credentials locally.
@@ -126,6 +126,20 @@ Once the cluster is up, run the following command to configure `kubectl` to conn
 
 ```bash
 az aks get-credentials --resource-group $(terraform output -raw resource_group_name) --name $(terraform output -raw aks_cluster_name) --overwrite-existing
+```
+
+## Accessing Apigee Endpoint
+
+* Get the ingress IP/DNS to access Apigee
+```bash
+kubectl get pods -n apigee
+kubectl get svc dev-group -n apigee -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+```
+* Add the ingress IP/DNS to Apigee Environment Group Hostnames through Apigee UI
+
+* Access the healthz endpoint
+```bash
+curl -H 'User-Agent: GoogleHC' https://my-eks-alb-123456.us-west-2.elb.amazonaws.com/healthz/ingress -k
 ```
 
 ## Cleanup
