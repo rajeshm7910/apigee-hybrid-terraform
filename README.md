@@ -1,6 +1,6 @@
 # Apigee Hybrid Terraform
 
-This repository contains Terraform configurations for deploying and managing Apigee Hybrid. The project supports deployment on both Google Kubernetes Engine (GKE) and Azure Kubernetes Service (AKS). The purpose is to create a evaluation Apigee instance to test the feature.
+This repository contains Terraform configurations for deploying and managing Apigee Hybrid. The project supports deployment on both Google Kubernetes Engine (GKE) , Azure Kubernetes Service (AKS), Elastic Kubernetes Service (EKS) and Supported Kubernetes Platforms. The purpose is to create a evaluation Apigee instance to test the feature.
 
 
 ## Project Structure
