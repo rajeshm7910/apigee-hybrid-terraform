@@ -63,7 +63,7 @@ Once the terraform provisions the aks infrastructure, it proceeds to create Apig
     *   Ensure that Organization Policy is not disabled to create service account and associated Service Account Key.
     *   Ensure that the user performing terraform has the permissions to access Google Cloud resources. While not recommended but roles like `roles/editor` or `roles/owner` should ensure all tasks completes successfully.
     *   Follow the instructions in the Apigee Hybrid documentation to authenticate with GCP using `gcloud auth application-default login` and set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable.
-    *   Set the `gcloud config set project <your-gcp-project-id>`
+    *   Optional: Set the `gcloud config set project <your-gcp-project-id>`
 
 3.  **Customize the Terraform configuration files**:
     *   Review `main.tf` (and any module files) to adjust Azure resource definitions like VNet address spaces, AKS cluster version, node pool configurations (VM sizes, count, taints, labels for Apigee workloads).

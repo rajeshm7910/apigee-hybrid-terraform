@@ -7,10 +7,9 @@ This directory contains Terraform configurations for deploying Apigee Hybrid on 
 1. **Existing Kubernetes Cluster**:
    - A running Kubernetes cluster (version 1.29 or later)
    - At least two node pools:
-     - Runtime node pool for Apigee runtime components with name `apigeerun`
-     - Data node pool for Apigee data components with name `apigeedata`
+     - Runtime node pool for Apigee runtime components with node labels set with key cloud.google.com/gke-nodepool and value apigee-runtime
+     - Data node pool for Apigee data with node labels set with key cloud.google.com/gke-nodepool and value apigee-data
    - Proper network configuration for the cluster
-   - Load balancer configured for ingress
 
 2. **Kubernetes Access**:
    - `kubectl` configured to access your cluster
@@ -19,11 +18,18 @@ This directory contains Terraform configurations for deploying Apigee Hybrid on 
 
 3. **Google Cloud Setup**:
    - Google Cloud SDK installed and configured
-   - Project with Apigee API enabled
-   - Service account with necessary permissions
+   - Optional: Project with Apigee API enabled. The script enables it.
+   - Optional: Service account with necessary permissions. The script automatically creates it.
    - Organization Policy allowing service account key creation
 
-4. **Required Tools**:
+4. **Authenticate with GCP**:
+    *   Ensure you have the Google Cloud SDK (gcloud) installed and configured.
+    *   Ensure that Organization Policy is not disabled to create service account and associated Service Account Key.
+    *   Ensure that the user performing terraform has the permissions to access Google Cloud resources. While not recommended but roles like `roles/editor` or `roles/owner` should ensure all tasks completes successfully.
+    *   Follow the instructions in the Apigee Hybrid documentation to authenticate with GCP using `gcloud auth application-default login` and set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable.
+    *   Optional: Set the `gcloud config set project <your-gcp-project-id>`
+
+5. **Required Tools**:
    - Terraform >= 1.0.0
    - Helm >= 3.10.0
    - kubectl
@@ -32,7 +38,7 @@ This directory contains Terraform configurations for deploying Apigee Hybrid on 
 ## Configuration
 
 1. **Set up your variables**:
-   Create a `terraform.tfvars` file with your specific values:
+   Update `terraform.tfvars` file with your specific values:
 
    ```hcl
    project_id = "apigee-gke-example3"

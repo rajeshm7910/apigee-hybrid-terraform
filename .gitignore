@@ -38,3 +38,4 @@ override.tf.json
 terraform.rc
 new_policy.yaml
 output
+kubeconfig

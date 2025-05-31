@@ -40,7 +40,7 @@ Once the terraform provisions the GKE infrastructure, it proceeds to create Apig
 2. **Configure Google Cloud Authentication**:
    * Ensure you have the Google Cloud SDK (gcloud) installed and configured
    * Run `gcloud auth application-default login` to authenticate
-   * Set your project: `gcloud config set project <your-project-id>`
+   * Optional: Set your project: `gcloud config set project <your-project-id>`
    * Ensure that Organization Policy is not disabled to create service account and associated Service Account Key
    * Ensure that the user performing terraform has the permissions to access Google Cloud resources. While not recommended but roles like `roles/editor` or `roles/owner` should ensure all tasks completes successfully
 
