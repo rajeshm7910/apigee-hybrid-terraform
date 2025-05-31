@@ -3,9 +3,9 @@ eks_region     = "us-west-1"          # AWS region for EKS cluster
 
 
 # Apigee Configuration
-project_id               = "apigee-eks-example1"  # Replace with your actual GCP project ID
+project_id               = "apigee-eks-example2"  # Replace with your actual GCP project ID
 region                   = "us-west1" #GCP Region
-apigee_org_name          = "apigee-eks-example1"  # Must be unique across all Apigee organizations
+apigee_org_name          = "apigee-eks-example2"  # Must be unique across all Apigee organizations
 apigee_env_name          = "dev"                 # Environment name (dev, test, prod, etc.)
 apigee_envgroup_name     = "dev-group"           # Environment group name
 cluster_name             = "apigee-eks"          # EKS cluster name

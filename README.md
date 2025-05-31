@@ -47,14 +47,6 @@ To apply these policies, run:
 ./apply_org_policies.sh
 ```
 
-### Resource Requirements
-- Minimum GKE node configuration:
-  - Runtime nodes: e2-standard-4 (4 vCPU, 16GB memory)
-  - Data nodes: e2-standard-4 (4 vCPU, 16GB memory)
-- VPC network with:
-  - Primary subnet: /16 CIDR range
-  - Secondary pod range: /16 CIDR range
-  - Secondary service range: /16 CIDR range
 
 ## Quick Start
 
@@ -138,6 +130,47 @@ Configurations for deploying Apigee Hybrid on other Kubernetes Service, includin
 - Regular backups of the Apigee runtime data
 - Terraform state backup
 - Configuration version control
+
+## Known Issues and Solutions
+
+### Terraform Provider Warnings
+
+1. **Deprecated `local_file` Resource**
+   ```
+   Warning: Attribute Deprecated
+   Use the `local_sensitive_file` resource instead
+   ```
+   - **Solution**: Update the code to use `local_sensitive_file` instead of `local_file` for sensitive content
+   - **Location**: `apigee-hybrid-core/main.tf`
+
+2. **Deprecated `inline_policy` in AWS IAM Role**
+   ```
+   Warning: Argument is deprecated
+   inline_policy is deprecated. Use the aws_iam_role_policy resource instead
+   ```
+   - **Solution**: Replace `inline_policy` with separate `aws_iam_role_policy` resources
+   - **Location**: EKS module configuration
+
+### Provider Inconsistencies
+
+1. **Google Service Account Inconsistency**
+   ```
+   Error: Provider produced inconsistent result after apply
+   When applying changes to module.apigee_hybrid.google_service_account.apigee_non_prod_sa
+   ```
+   - **Solution**: 
+     1. Remove the service account from GCP Project
+     2. Reapply the terraform configuration 'terraform apply'
+### Workarounds
+
+For immediate workarounds:
+1. Use `terraform apply -refresh=false` to skip refresh
+2. If issues persist, try:
+   ```bash
+   terraform state rm [resource_address]
+   terraform import [resource_address] [resource_id]
+   terraform apply
+   ```
 
 ## Troubleshooting
 

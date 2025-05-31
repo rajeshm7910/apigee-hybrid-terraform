@@ -5,7 +5,7 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 4.0" # Consider pinning to a specific minor like "~> 4.80"
+      version = "~> 6.30.0" # Consider pinning to a specific minor like "~> 4.80"
     }
     local = {
       source  = "hashicorp/local"
@@ -251,6 +251,8 @@ resource "google_apigee_organization" "apigee_org" {
     google_project_service.apigee,
     google_project_service.compute,
     google_project_service.container, # Apigee may require container API for its operations
+    local_file.apigee_non_prod_sa_key_file, # Ensure SA Key is created before org
+
   ]
 }
 

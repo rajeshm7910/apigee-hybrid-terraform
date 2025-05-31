@@ -67,7 +67,9 @@ Once the terraform provisions the aks infrastructure, it proceeds to create Apig
 
 3.  **Customize the Terraform configuration files**:
     *   Review `main.tf` (and any module files) to adjust Azure resource definitions like VNet address spaces, AKS cluster version, node pool configurations (VM sizes, count, taints, labels for Apigee workloads).
-    *   Update `variables.tf` and your `terraform.tfvars` file (or create one, e.g., `terraform.tfvars`) with your specific values (e.g., Azure region, resource group name, desired cluster name, node counts, VM SKUs).
+    *   Update `terraform.tfvars` file (or create one, e.g., `terraform.tfvars`) with your specific values (e.g., Azure region and Apigee Organization etc).
+    *   Set `create_org=true` if you want the script to create Apigee organization for you.
+    *   Set `apigee_install=true` if you want the script to install Apigee Hybrid for you.
     *   Ensure your Terraform configuration outputs key values like `resource_group_name` and `aks_cluster_name` which will be used later.
 
 4.  **Run `terraform plan`**:
@@ -146,6 +148,7 @@ When you're done with the Apigee hybrid setup and want to remove all created res
    - NAT Gateway and associated resources
    - Resource Group
    - All other Azure resources created by the Terraform configuration
+   - Apigee Organization, Environment and Environment Group
 
 3. **Clean Up Local Files**:
    ```bash

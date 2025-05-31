@@ -6,7 +6,7 @@ terraform {
     }
     google = {
       source  = "hashicorp/google"
-      version = "~> 4.0" # Consider pinning to a specific minor like "~> 4.80"
+      version = "~> 6.30.0" 
     }
     random = { # Added for random_string
       source  = "hashicorp/random"

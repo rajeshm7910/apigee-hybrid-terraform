@@ -53,8 +53,10 @@ Once the terraform provisions the GKE infrastructure, it proceeds to create Apig
 ## Pre-Cluster Setup Steps
 
 1. **Customize the Terraform configuration files**:
-   * Review `main.tf` to adjust GCP resource definitions like VPC network, GKE cluster version, node pool configurations (machine types, count, taints, labels for Apigee workloads)
-   * Update `variables.tf` and your `terraform.tfvars` file with your specific values (e.g., GCP region, project ID, desired cluster name, node counts, machine types)
+   * Review `main.tf` and `variables.tf` to adjust GCP resource definitions like VPC network, GKE cluster version, node pool configurations (machine types, count, taints, labels for Apigee workloads)
+   * Update `terraform.tfvars` file with your specific values (e.g., GCP region, project ID and other details)
+   *   Set `create_org=true` if you want the script to create Apigee organization for you.
+   *   Set `apigee_install=true` if you want the script to install Apigee Hybrid for you.
    * Ensure your Terraform configuration outputs key values like `project_id` and `cluster_name` which will be used later
 
 2. **Run `terraform plan`**:
