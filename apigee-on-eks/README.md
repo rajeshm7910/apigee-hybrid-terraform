@@ -106,6 +106,20 @@ aws eks --region $(terraform output -raw region) update-kubeconfig \
     --name $(terraform output -raw cluster_name)
 ```
 
+## Accessing Apigee Endpoint
+
+* Get the ingress IP/DNS to access Apigee
+```bash
+kubectl get pods -n apigee
+kubectl get svc dev-group -n apigee -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+```
+* Add the ingress IP/DNS to Apigee Environment Group Hostnames through Apigee UI
+
+* Access the healthz endpoint
+```bash
+curl -H 'User-Agent: GoogleHC' https://my-eks-alb-123456.us-west-2.elb.amazonaws.com/healthz/ingress -k
+```
+
 ## Multiple clusters  
 
 To create multiple clusters perform the following steps  

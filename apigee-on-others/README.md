@@ -119,11 +119,21 @@ This directory contains Terraform configurations for deploying Apigee Hybrid on 
    gcloud apigee envgroups list --organization=$PROJECT_ID
    ```
 
-3. **Test API Access**:
-   ```bash
-   curl -v https://$APIGEE_RUNTIME_HOSTNAME
-   ```
+3. **Verify Apigee Endpoint**:
 
+* Get the ingress IP/DNS to access Apigee
+```bash
+kubectl get pods -n apigee
+kubectl get svc dev-group -n apigee -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+```
+* Add the ingress IP/DNS to Apigee Environment Group Hostnames through Apigee UI
+
+* Access the healthz endpoint
+```bash
+curl -H 'User-Agent: GoogleHC' https://api.example.com/healthz/ingress -k \
+  --resolve "api.example.com:443:your-ingress-ip>"
+```
+   
 ## Cleanup
 
 1. **Remove Apigee Components**:

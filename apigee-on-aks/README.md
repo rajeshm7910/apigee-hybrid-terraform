@@ -139,7 +139,8 @@ kubectl get svc dev-group -n apigee -o jsonpath='{.status.loadBalancer.ingress[0
 
 * Access the healthz endpoint
 ```bash
-curl -H 'User-Agent: GoogleHC' https://my-eks-alb-123456.us-west-2.elb.amazonaws.com/healthz/ingress -k
+curl -H 'User-Agent: GoogleHC' https://api.example.com/healthz/ingress -k \
+  --resolve "api.example.com:443:your-ingress-ip>"
 ```
 
 ## Cleanup
