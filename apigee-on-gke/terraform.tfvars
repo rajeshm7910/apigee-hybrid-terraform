@@ -1,9 +1,9 @@
 # GCP Configuration
-project_id = "apigee-gke-example3"
+project_id = "apigee-gke-example7"
 region     = "us-central1"
 
 # Apigee Configuration
-apigee_org_name          = "apigee-gke-example3" #Same as Projectid
+apigee_org_name          = "apigee-gke-example7" #Same as Projectid
 apigee_env_name          = "dev"
 apigee_envgroup_name     = "dev-group"
 apigee_namespace         = "apigee"
@@ -26,7 +26,7 @@ ingress_svc_annotations = {
   # "cloud.google.com/load-balancer-type" = "Internal"
 }
 
-create_org=false
+create_org=true
 apigee_install=true
 
 # Optional: Paths to template files if you want to use custom templates

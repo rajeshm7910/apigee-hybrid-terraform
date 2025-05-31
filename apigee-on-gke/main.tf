@@ -12,6 +12,25 @@ provider "google" {
   region  = var.region
 }
 
+# Enable required APIs
+resource "google_project_service" "required_apis" {
+  for_each = toset([
+    "compute.googleapis.com",
+    "container.googleapis.com",
+    "cloudresourcemanager.googleapis.com",
+    "apigee.googleapis.com",
+    "apigeeconnect.googleapis.com",
+    "cloudkms.googleapis.com",
+    "servicenetworking.googleapis.com"
+  ])
+  
+  project = var.project_id
+  service = each.key
+
+  disable_dependent_services = false
+  disable_on_destroy        = false
+}
+
 # Generate a random suffix for resource names
 resource "random_string" "suffix" {
   length  = 8
@@ -35,6 +54,10 @@ locals {
 resource "google_compute_network" "vpc" {
   name                    = "vpc-apigee-${local.name_suffix}"
   auto_create_subnetworks = false
+
+  depends_on = [
+    google_project_service.required_apis
+  ]
 }
 
 # Create Subnet

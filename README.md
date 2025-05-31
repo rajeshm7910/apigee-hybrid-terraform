@@ -17,23 +17,44 @@ This repository contains Terraform configurations for deploying and managing Api
 
 ## Prerequisites
 
+### Required Tools
 - Terraform >= 1.0.0
-- Google Cloud SDK
+- Google Cloud SDK (gcloud CLI)
 - kubectl
-- gcloud CLI
-- Helm Chart >= 3.15+
-- Access to a GCP project with appropriate permissions (Owner/Edior)
-  - The following organization policies should use Google's default settings:
-    - `disableServiceAccountKeyCreation`
-    - `requireOsLogin`
-    - `requireShieldedVm`
-    - `vmExternalIpAccess`
-- Ensure that it doesn't have service account with prefix apigee-non-prod@<project_id>
+- Helm >= 3.15.0
 
-- For AKS deployments: Azure CLI and access to an Azure subscription
-- For EKS deployments: AWS CLI and access to an AWS Keys
-- For GKE deployments: gcloud tools and access to projects
+### GCP Project Setup
+- A GCP project with billing enabled
+- Appropriate IAM permissions (Owner/Editor role)
+- Required APIs enabled (handled automatically by Terraform):
+  - Compute Engine API
+  - Container (GKE) API
+  - Cloud Resource Manager API
+  - Apigee API
+  - Apigee Connect API
+  - Cloud KMS API
+  - Service Networking API
 
+### Organization Policies
+The following organization policies should use Google's default settings:
+- `disableServiceAccountKeyCreation`
+- `requireOsLogin`
+- `requireShieldedVm`
+- `vmExternalIpAccess`
+
+To apply these policies, run:
+```bash
+./apply_org_policies.sh
+```
+
+### Resource Requirements
+- Minimum GKE node configuration:
+  - Runtime nodes: e2-standard-4 (4 vCPU, 16GB memory)
+  - Data nodes: e2-standard-4 (4 vCPU, 16GB memory)
+- VPC network with:
+  - Primary subnet: /16 CIDR range
+  - Secondary pod range: /16 CIDR range
+  - Secondary service range: /16 CIDR range
 
 ## Quick Start
 

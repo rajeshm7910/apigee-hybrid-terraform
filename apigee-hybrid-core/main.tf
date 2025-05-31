@@ -27,15 +27,12 @@ resource "random_string" "suffix" {
   length  = 6 # Shortened to avoid hitting length limits on some Azure resources
   special = false
   upper   = false
-  keepers = { 
-    _ = "1"
-  }
 }
 
 locals {
   random_suffix = substr(random_string.suffix.result, 0, 6)
   apigee_org_constructed_id = "organizations/${var.project_id}" # Apigee Org ID is the Project ID
-  service_account_id_short  = "apigee-non-prod-${local.random_suffix}" # Or make this configurable
+  service_account_id_short  = "${var.apigee_service_account_name}"  #"apigee-non-prod-${local.random_suffix}" # Or make this configurable
   service_account_email     = "${local.service_account_id_short}@${var.project_id}.iam.gserviceaccount.com"
 
   effective_org_id = var.create_org ? (

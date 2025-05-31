@@ -83,6 +83,12 @@ variable "overrides_template_path" {
   default     = "" # Will be set to path.module in main.tf if not overridden
 }
 
+variable "apigee_service_account_name" {
+  description = "The name of the service account"
+  type        = string
+  default     = "apigee-svc-tf" # Will be set to path.module in main.tf if not overridden
+}
+
 variable "service_template_path" {
   description = "Path to the Apigee service template file (e.g., apigee-service-template.yaml)."
   type        = string
