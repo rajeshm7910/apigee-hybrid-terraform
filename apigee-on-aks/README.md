@@ -106,13 +106,14 @@ When you run `terraform apply`, the following resources are created in sequence:
    - Creates a service account for Apigee with necessary IAM roles
    - Generates and saves service account key
    - Creates self-signed TLS certificates for Apigee environment group
-   - Generates Apigee overrides.yaml configuration file from the privided template file with mapped variables.
+   - Generates Apigee overrides.yaml configuration file from the provided template file with mapped variables
    - Sets up Apigee organization, environment, and environment group
-   - Creates a directory output/${PROJECT_ID} to store generated certificates, keys , overrides.yaml and apigee-service.yaml.
+   - Creates a directory output/${PROJECT_ID} to store generated certificates, keys, overrides.yaml and apigee-service.yaml
 
 5. **Final Configuration**:
    - Configures kubectl to connect to the new AKS cluster
-   - Installs Apigee Hybrid (using Helm) by calling setup_apigee.sh script. The scripts unbundles all helm charts in output/${PROJECT_ID}.
+   - Installs Apigee Hybrid (using Helm) by calling setup_apigee.sh script
+   - The script unbundles all helm charts in output/${PROJECT_ID}
    - Outputs important information like resource group name and kubeconfig
 
 The entire process typically takes 15-30 minutes to complete, depending on the size of your cluster and the number of resources being created.

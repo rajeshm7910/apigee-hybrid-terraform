@@ -21,47 +21,90 @@ Run terraform init to initialise terraform
 
 
 ## Pre-Cluster Setup Steps  
-
-1. Perform steps 1,2 and 3 in part 1 of the Apigee Hybrid setup to create your APigee organization, environment and environment group described [here](https://cloud.google.com/apigee/docs/hybrid/v1.12/precog-overview)  
-2. Run aws configure - Run aws configure command to configure settings that the AWS Command Line Interface (AWS CLI) uses to interact with AWS. The credentials and config file are created/updated when you run the command aws configure. The credentials file is located at ~/.aws/credentials on Linux or macOS,  or at C:\Users\USERNAME\.aws\credentials on Windows.  
+ 
+1. Run aws configure - Run aws configure command to configure settings that the AWS Command Line Interface (AWS CLI) uses to interact with AWS. The credentials and config file are created/updated when you run the command aws configure. The credentials file is located at ~/.aws/credentials on Linux or macOS,  or at C:\Users\USERNAME\.aws\credentials on Windows.  
    Output should be similar to below  
    ![AWS Config](Images/aws-config.png)
    
-3. Customise the terraform configuration files  
-   3a. main.tf with your worker nodes and labels  
-   3b. Customise terraform.tf  
-   
-4. Run Terraform plan - and validate the list of resources to be created, there should be a count of 63 resources to be created in AWS. Output should be similar to below  
+2. **Authenticate with GCP**:
+    *   Ensure you have the Google Cloud SDK (gcloud) installed and configured.
+    *   Ensure that Organization Policy is not disabled to create service account and associated Service Account Key.
+    *   Ensure that the user performing terraform has the permissions to access Google Cloud resources. While not recommended but roles like `roles/editor` or `roles/owner` should ensure all tasks completes successfully.
+    *   Follow the instructions in the Apigee Hybrid documentation to authenticate with GCP using `gcloud auth application-default login` and set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable.
+    *   Set the `gcloud config set project <your-gcp-project-id>`
 
-   ![Terraform Plan](Images/tf-plan.png)  
+3.  **Customize the Terraform configuration files**:
+    *   Review `main.tf` (and any module files) to adjust your worker nodes and labels.
+    *   Update `terraform.tfvars` file (or create one, e.g., `terraform.tfvars`) with your specific values (e.g., eks region and Apigee Organization etc).
+    *   Set `create_org=true` if you want the script to create Apigee organization for you.
+    *   Set `apigee_install=true` if you want the script to install Apigee Hybrid for you.
 
-   
-5. Run terraform apply to have the 63 resources created in AWS and eks cluster comes up 
+4.  **Run `terraform plan`**:
+    Validate the list of Azure resources to be created. The exact count will vary based on your configuration. Review the plan carefully to ensure it matches your expectations.
+    ![Terraform Plan](Images/tf-plan.png)  
 
-## Accessing the Cluster  
-Once the cluster is up run the below command to gain access to the cluster  
+5.  **Run `terraform apply`**:
+    This will provision the AWS resources and create the EKS cluster. Confirm the apply when prompted. This process can take several minutes.
 
+## What Happens During Apply
+
+When you run `terraform apply`, the following sequence of events occurs:
+
+1. **AWS Infrastructure Setup**:
+   - Creates a new VPC with public and private subnets across two availability zones
+   - Sets up NAT Gateway for private subnet internet access
+   - Configures security groups and IAM roles
+   - Creates an EKS cluster with managed node groups:
+     - `apigee-runtime` node group with 2 t3.xlarge instances
+     - `apigee-data` node group with 1 t3.xlarge instance
+   - Installs the AWS EBS CSI driver for persistent storage
+
+2. **GCP/Apigee Setup** (if `create_org=true`):
+   - Enables required Google Cloud APIs (Apigee, IAM, Compute, etc.)
+   - Creates an Apigee organization in your GCP project
+   - Sets up an Apigee environment (e.g., "dev")
+   - Creates an environment group with specified hostnames
+   - Attaches the environment to the environment group
+
+3. **Service Account and Certificate Setup**:
+   - Creates a GCP service account for Apigee Hybrid
+   - Generates a service account key
+   - Creates self-signed TLS certificates for the environment group hostnames
+   - Saves all credentials and certificates to the `output/<project-id>` directory
+
+4. **Apigee Hybrid Installation** (if `apigee_install=true`):
+   - Creates the Apigee namespace in the EKS cluster
+   - Enables control plane access for the service account
+   - Installs required Kubernetes components:
+     - Custom Resource Definitions (CRDs)
+     - cert-manager
+     - Apigee operator
+   - Deploys Apigee components in sequence:
+     - Datastore (Cassandra)
+     - Telemetry
+     - Redis
+     - Ingress Manager
+     - Organization
+     - Environment
+     - Environment Group
+   - Sets up the ingress gateway with the specified configuration
+
+The entire process typically takes 15-30 minutes to complete, depending on your network speed and the size of the cluster.
+
+## Accessing the Cluster
+
+The terraform configuration automatically configures your local kubectl context to connect to the newly created EKS cluster. You can verify your access by running:
+
+```bash
+kubectl get pods -A
 ```
+
+If you need to manually configure kubectl access to the cluster, you can use the following command:
+
+```bash
 aws eks --region $(terraform output -raw region) update-kubeconfig \
     --name $(terraform output -raw cluster_name)
 ```
-
-Now you can run```kubectl get pods -A```
- to confirm the system pods have been created before you proceed.  
- 
-
-## Apigee Hybrid Installation steps  
-
-Now proceed with part 2 of the setup steps to install Apigee hybrid described [here](https://cloud.google.com/apigee/docs/hybrid/v1.12/install-download-charts)   
-
-At the end of the steps to install Apigee hybrid along with the helm charts, the Apigee Runtime components would be created in the AWS EKS cluster as shown below  
-
-![Apigee Runtime in AWS](Images/aws-objects.png)
-
-
-
-
-
 
 ## Multiple clusters  
 
