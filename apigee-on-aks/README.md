@@ -5,7 +5,7 @@ This tool is open-source software. It is not an officially supported Google prod
 
 The following diagram illustrates the architecture of Apigee Hybrid on Azure AKS:
 
-![Apigee Hybrid on Azure AKS Architecture](../diagram/apigee_hybrid_gke.png)
+![Apigee Hybrid on Azure AKS Architecture](../diagram/apigee_hybrid_aks.png)
 
 The architecture consists of:
 
