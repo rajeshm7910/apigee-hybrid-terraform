@@ -26,6 +26,7 @@ The script accepts the following parameters:
 |-----------|-------|----------|---------|-------------|
 | `--version` | `-v` | No | 1.14.2-hotfix.1 | Apigee version to install |
 | `--namespace` | `-n` | No | apigee | Kubernetes namespace for Apigee components |
+| `--sa_email` | `-a` | Yes | - | Service Account email |
 | `--overrides` | `-o` | Yes | - | Path to overrides.yaml file |
 | `--service` | `-s` | Yes | - | Path to service template file |
 | `--key` | `-k` | Yes | - | Path to service account key JSON file |
@@ -35,21 +36,13 @@ The script accepts the following parameters:
 
 ### Sample Usage
 
-1. **Basic Usage with Required Parameters**:
-   ```bash
-   ./setup_apigee.sh \
-     --overrides "/path/to/overrides.yaml" \
-     --service "/path/to/service.yaml" \
-     --key "/path/to/sa-key.json" \
-     --cert "/path/to/cert.pem" \
-     --private-key "/path/to/key.pem"
-   ```
 
-2. **Custom Version and Namespace**:
+1. **Custom Version and Namespace**:
    ```bash
    ./setup_apigee.sh \
      --version "1.14.2-hotfix.1" \
      --namespace "apigee-prod" \
+     --sa_email "apigee-svc-tf@project.gserviceaccount.com" \
      --overrides "/path/to/overrides.yaml" \
      --service "/path/to/service.yaml" \
      --key "/path/to/sa-key.json" \
@@ -57,11 +50,12 @@ The script accepts the following parameters:
      --private-key "/path/to/key.pem"
    ```
 
-3. **Using Short Options**:
+2. **Using Short Options**:
    ```bash
    ./setup_apigee.sh \
      -v "1.14.2-hotfix.1" \
      -n "apigee" \
+     -a "apigee-svc-tf@project.gserviceaccount.com" \
      -o "/path/to/overrides.yaml" \
      -s "/path/to/service.yaml" \
      -k "/path/to/sa-key.json" \
