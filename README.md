@@ -68,7 +68,7 @@ To apply these policies, run:
    ```
 
 4. Configure your variables:
-   - Copy `terraform.tfvars.example` to `terraform.tfvars`
+   - Edit `terraform.tfvars` with required values. You can refer `terraform.tfvars.sample`
    - Update the variables with your specific values
 
 5. Apply the configuration:
