@@ -51,6 +51,7 @@ Once the terraform provisions the GKE infrastructure, it proceeds to create Apig
    * Download the service account key JSON file
    * Set the environment variable: `export GOOGLE_APPLICATION_CREDENTIALS="path/to/your/service-account-key.json"`
    * Run `gcloud auth activate-service-account --key-file="path/to/your/service-account-key.json"`
+   * Set your project: `gcloud config set project <your-project-id>`
    * Alternatively, you can specify the credentials file path in your Terraform provider configuration:
      ```hcl
      provider "google" {
