@@ -33,7 +33,7 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         -c|--kubeconfig)
-            KUBECONFIG="$2"
+            KUBECONFIG_FILE="$2"
             shift 2
             ;;
         -o|--overrides)
@@ -334,14 +334,16 @@ setup_ingress() {
 
 setup_kubeconfig() {
 
-    if [ -z "$KUBECONFIG" ]; then
-        echo "KUBECONFIG is not set. Will use default kubeconfig file"
+    if [ -z "$KUBECONFIG_FILE" ]; then
+        echo "KUBECONFIG_FILE is not set. Will use default kubeconfig"
     else
-        export KUBECONFIG=$KUBECONFIG
+        if [ -f "$KUBECONFIG_FILE" ]; then
+            export KUBECONFIG=$KUBECONFIG_FILE
+        else
+            echo "KUBECONFIG_FILE does not exist"
+        fi
     fi
-
-    echo "KUBECONFIG: $KUBECONFIG"
-    
+    echo "Checking if kubectl is configured correctly"
     kubectl get nodes
     if [ $? -ne 0 ]; then
         echo "Failed to get nodes"

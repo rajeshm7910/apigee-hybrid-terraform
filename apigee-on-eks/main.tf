@@ -184,6 +184,18 @@ resource "local_file" "kubeconfig" {
   ]
 }
 
+resource "null_resource" "cluster_setup" {
+  triggers = {
+    timestamp = timestamp()
+  }
+
+  # Use local-exec provisioner to run a script to configure kubectl
+  provisioner "local-exec" {
+    command = "export KUBECONFIG=${abspath("${path.module}/output/${var.project_id}/apigee-kubeconfig")} && aws eks update-kubeconfig --name ${local.cluster_name} --region ${var.eks_region}"
+  }
+
+  depends_on = [module.eks, aws_eks_addon.ebs_csi, local_file.kubeconfig]
+}
 
 
 # Add Apigee Hybrid module
@@ -218,5 +230,6 @@ module "apigee_hybrid" {
     module.eks,
     aws_eks_addon.ebs_csi,
     local_file.kubeconfig,
+    null_resource.cluster_setup,
   ]
 }

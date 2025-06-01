@@ -142,11 +142,17 @@ The entire process typically takes 15-30 minutes to complete, depending on the s
 
 ## Accessing the Cluster
 
-Once the cluster is up, run the following command to configure `kubectl` to connect to your new AKS cluster. Ensure your Terraform configuration outputs `resource_group_name` and `aks_cluster_name`.
+Terraform generates kubeconfig specific to the output directory and it can be found at output/<project-id>/apiigee-kubeconfig.
+
+To access the cluster, configure your `kubectl` to use the generated kubeconfig file:
+```bash
+export KUBECONFIG=output/<project-id>/apigee-kubeconfig
+```
 
 ```bash
-az aks get-credentials --resource-group $(terraform output -raw resource_group_name) --name $(terraform output -raw aks_cluster_name) --overwrite-existing
+kubectl get pods -A
 ```
+
 
 ## Accessing Apigee Endpoint
 

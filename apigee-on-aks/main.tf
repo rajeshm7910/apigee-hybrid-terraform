@@ -211,6 +211,23 @@ resource "local_file" "kubeconfig" {
   ]
 }
 
+resource "null_resource" "cluster_setup" {
+  triggers = {
+    timestamp = timestamp()
+  }
+
+  # Use local-exec provisioner to run a script to configure kubectl
+  provisioner "local-exec" {
+    command = "export KUBECONFIG=${abspath("${path.module}/output/${var.gcp_project_id}/apigee-kubeconfig")} && az aks get-credentials --resource-group ${local.resource_group_name} --name ${local.cluster_name} --overwrite-existing"
+  }
+
+  depends_on = [
+    azurerm_kubernetes_cluster_node_pool.runtime,
+    azurerm_kubernetes_cluster_node_pool.data,
+    azurerm_kubernetes_cluster.aks,
+    azurerm_role_assignment.aks_subnet_join_permission # Add dependency here
+  ]
+}
 
 
 # Call the apigee-hybrid-core module
@@ -254,6 +271,7 @@ module "apigee_core" { # Renamed module instance for clarity
     azurerm_kubernetes_cluster.aks, # Ensure AKS is ready before Apigee core module attempts anything K8s related
     azurerm_kubernetes_cluster_node_pool.runtime,
     azurerm_kubernetes_cluster_node_pool.data,
-    local_file.kubeconfig # Ensure kubeconfig is generated before Apigee tries to use it
+    local_file.kubeconfig, # Ensure kubeconfig is generated before Apigee tries to use it
+    null_resource.cluster_setup
   ]
 }

@@ -247,6 +247,21 @@ resource "local_file" "kubeconfig" {
 }
 
 
+resource "null_resource" "cluster_setup" {
+  # Use local-exec provisioner to run a script to configure kubectl
+  triggers = {
+    timestamp = timestamp()
+  }
+
+  provisioner "local-exec" {
+    command = "export KUBECONFIG=${abspath("${path.module}/output/${var.project_id}/apigee-kubeconfig")} && gcloud container clusters get-credentials ${google_container_cluster.gke.name} --region ${var.region} --project ${var.project_id}"
+  }
+  depends_on = [
+    local_file.kubeconfig,
+    google_container_cluster.gke,
+  ]
+}
+
 # Create output directory if it doesn't exist
 resource "null_resource" "create_output_dir" {
   provisioner "local-exec" {
@@ -286,5 +301,6 @@ module "apigee_hybrid" {
     google_container_node_pool.runtime,
     google_container_node_pool.data,
     local_file.kubeconfig,
+    null_resource.cluster_setup,
   ]
 } 

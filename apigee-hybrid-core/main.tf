@@ -351,6 +351,7 @@ resource "null_resource" "apigee_setup_execution" {
   triggers = {
     apigee_version                = var.apigee_version
     apigee_namespace              = var.apigee_namespace
+    kubeconfig                    = var.kubeconfig
     apigee_overrides_yaml_content = local_file.apigee_overrides.content
     apigee_service_yaml_content   = local_file.apigee_service.content
     apigee_sa_key_json_path       = abspath(local_file.apigee_non_prod_sa_key_file.filename)
@@ -362,7 +363,8 @@ resource "null_resource" "apigee_setup_execution" {
 
   provisioner "local-exec" {
     when = destroy
-    command = "kubectl delete -f ${self.triggers.output_dir}/apigee-service.yaml"
+    #command = "kubectl delete -f ${self.triggers.output_dir}/apigee-service.yaml"
+    command = "if [ -n \"${self.triggers.kubeconfig}\" ] && [ -f \"${self.triggers.kubeconfig}\" ]; then export KUBECONFIG=${self.triggers.kubeconfig}; fi && kubectl delete -f ${self.triggers.output_dir}/apigee-service.yaml"
     on_failure = continue
   }
   

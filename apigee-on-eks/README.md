@@ -113,18 +113,18 @@ The entire process typically takes 15-30 minutes to complete, depending on your 
 
 ## Accessing the Cluster
 
-The terraform configuration automatically configures your local kubectl context to connect to the newly created EKS cluster. You can verify your access by running:
+Terraform generates kubeconfig specific to the output directory and it can be found at output/<project-id>/apiigee-kubeconfig.
+
+To access the cluster, configure your `kubectl` to use the generated kubeconfig file:
+```bash
+export KUBECONFIG=output/<project-id>/apigee-kubeconfig
+```
 
 ```bash
 kubectl get pods -A
 ```
 
-If you need to manually configure kubectl access to the cluster, you can use the following command:
 
-```bash
-aws eks --region $(terraform output -raw region) update-kubeconfig \
-    --name $(terraform output -raw cluster_name)
-```
 
 ## Accessing Apigee Endpoint
 
