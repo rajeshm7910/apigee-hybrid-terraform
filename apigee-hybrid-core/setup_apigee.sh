@@ -8,8 +8,9 @@ APIGEE_NAMESPACE="apigee"
 usage() {
     echo "Usage: $0 [options]"
     echo "Options:"
-    echo "  -v, --version VERSION       Apigee version (default: $APIGEE_VERSION)"
-    echo "  -n, --namespace NAMESPACE   Apigee namespace (default: $APIGEE_NAMESPACE)"
+    echo "  -v, --version VERSION        Apigee version (default: $APIGEE_VERSION)"
+    echo "  -n, --namespace NAMESPACE    Apigee namespace (default: $APIGEE_NAMESPACE)"
+    echo "  -c, --kubeconfig KUBECONFIG  Path to kubeconfig file (default: $KUBECONFIG)"
     echo "  -o, --overrides PATH        Path to overrides.yaml file (required)"
     echo "  -s, --service PATH          Path to apigee service template file (required)"
     echo "  -a, --sa_email SA_EMAIL      Path to apigee service accounts template file (required)"
@@ -29,6 +30,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         -n|--namespace)
             APIGEE_NAMESPACE="$2"
+            shift 2
+            ;;
+        -c|--kubeconfig)
+            KUBECONFIG="$2"
             shift 2
             ;;
         -o|--overrides)
@@ -172,7 +177,7 @@ enable_control_plane_access() {
     local apigee_overrides_yaml_path=$2
     local org_name=$(grep -A 1 'org:' "$apigee_overrides_yaml_path" | grep 'org:' | awk '{print $2}')
 
-    export TOKEN=$(gcloud auth print-access-token)
+    export TOKEN=$(gcloud auth application-default print-access-token)
 
     curl -X PATCH -H "Authorization: Bearer $TOKEN" \
     -H "Content-Type:application/json" \
@@ -327,9 +332,27 @@ setup_ingress() {
     
 }
 
+setup_kubeconfig() {
+
+    if [ -z "$KUBECONFIG" ]; then
+        echo "KUBECONFIG is not set. Will use default kubeconfig file"
+    else
+        export KUBECONFIG=$KUBECONFIG
+    fi
+
+    echo "KUBECONFIG: $KUBECONFIG"
+    
+    kubectl get nodes
+    if [ $? -ne 0 ]; then
+        echo "Failed to get nodes"
+        exit 1
+    fi
+}
+
 # Main function
 main() {
     setup_apigee
+    setup_kubeconfig
     create_namespace $APIGEE_NAMESPACE
     enable_control_plane_access $APIGEE_NAMESPACE "overrides.yaml"
     install_crd

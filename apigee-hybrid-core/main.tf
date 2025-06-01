@@ -371,6 +371,7 @@ resource "null_resource" "apigee_setup_execution" {
       bash ${path.module}/setup_apigee.sh \
         --version "${var.apigee_version}" \
         --namespace "${var.apigee_namespace}" \
+        --kubeconfig "${var.kubeconfig}" \
         --sa_email "${local.service_account_email}" \
         --overrides "${abspath(local_file.apigee_overrides.filename)}" \
         --service "${abspath(local_file.apigee_service.filename)}" \

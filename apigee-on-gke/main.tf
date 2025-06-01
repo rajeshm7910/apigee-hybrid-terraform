@@ -209,47 +209,50 @@ resource "google_container_node_pool" "data" {
 # Generate kubeconfig
 resource "local_file" "kubeconfig" {
   content  = <<-KUBECONFIG
-    apiVersion: v1
-    kind: Config
-    current-context: ${google_container_cluster.gke.name}
-    contexts:
-    - context:
-        cluster: ${google_container_cluster.gke.name}
-        user: ${google_container_cluster.gke.name}
-      name: ${google_container_cluster.gke.name}
-    clusters:
-    - cluster:
-        certificate-authority-data: ${base64encode(google_container_cluster.gke.master_auth[0].cluster_ca_certificate)}
-        server: https://${google_container_cluster.gke.endpoint}
-      name: ${google_container_cluster.gke.name}
-    users:
-    - name: ${google_container_cluster.gke.name}
-      user:
-        exec:
-          apiVersion: client.authentication.k8s.io/v1beta1
-          command: gcloud
-          args:
-          - container
-          - clusters
-          - get-credentials
-          - ${google_container_cluster.gke.name}
-          - --region=${var.region}
-          - --project=${var.project_id}
+  apiVersion: v1
+  kind: Config
+  current-context: ${google_container_cluster.gke.name}
+  contexts:
+  - context:
+      cluster: ${google_container_cluster.gke.name}
+      user: ${google_container_cluster.gke.name}
+    name: ${google_container_cluster.gke.name}
+  clusters:
+  - cluster:
+      certificate-authority-data: ${google_container_cluster.gke.master_auth[0].cluster_ca_certificate}
+      server: https://${google_container_cluster.gke.endpoint}
+    name: ${google_container_cluster.gke.name}
+  users:
+  - name: ${google_container_cluster.gke.name}
+    user:
+      exec:
+        apiVersion: client.authentication.k8s.io/v1beta1
+        command: gcloud
+        args:
+        - container
+        - clusters
+        - get-credentials
+        - ${google_container_cluster.gke.name}
+        - --region=${var.region}
+        - --project=${var.project_id}
   KUBECONFIG
-  filename = "${path.module}/kubeconfig"
-}
+    filename = "${path.module}/output/${var.project_id}/apigee-kubeconfig"
+    file_permission = "0600"
 
-resource "null_resource" "cluster_setup" {
-  # Use local-exec provisioner to run a script to configure kubectl
-  provisioner "local-exec" {
-    command = "gcloud container clusters get-credentials ${google_container_cluster.gke.name} --region ${var.region} --project ${var.project_id}"
-  }
   depends_on = [
-    local_file.kubeconfig,
-    google_container_cluster.gke,
+    null_resource.create_output_dir,
+    google_container_node_pool.runtime,     # Ensure node pools are up before module might use kubeconfig
+    google_container_node_pool.data
   ]
 }
 
+
+# Create output directory if it doesn't exist
+resource "null_resource" "create_output_dir" {
+  provisioner "local-exec" {
+    command = "mkdir -p ${path.module}/output/${var.project_id}"
+  }
+}
 
 # Use the apigee-hybrid-core module
 module "apigee_hybrid" {
@@ -263,6 +266,8 @@ module "apigee_hybrid" {
   apigee_namespace         = var.apigee_namespace
   apigee_version           = var.apigee_version
   cluster_name             = google_container_cluster.gke.name
+  kubeconfig               = abspath("${path.module}/output/${var.project_id}/apigee-kubeconfig")
+  
   create_org               = var.create_org
   apigee_org_display_name  = var.apigee_org_display_name
   apigee_env_display_name  = var.apigee_env_display_name
@@ -280,6 +285,6 @@ module "apigee_hybrid" {
     google_container_cluster.gke,
     google_container_node_pool.runtime,
     google_container_node_pool.data,
-    null_resource.cluster_setup,
+    local_file.kubeconfig,
   ]
 } 

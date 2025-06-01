@@ -22,12 +22,29 @@ This directory contains Terraform configurations for deploying Apigee Hybrid on 
    - Optional: Service account with necessary permissions. The script automatically creates it.
    - Organization Policy allowing service account key creation
 
-4. **Authenticate with GCP**:
-    *   Ensure you have the Google Cloud SDK (gcloud) installed and configured.
-    *   Ensure that Organization Policy is not disabled to create service account and associated Service Account Key.
-    *   Ensure that the user performing terraform has the permissions to access Google Cloud resources. While not recommended but roles like `roles/editor` or `roles/owner` should ensure all tasks completes successfully.
-    *   Follow the instructions in the Apigee Hybrid documentation to authenticate with GCP using `gcloud auth application-default login` and set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable.
-    *   Optional: Set the `gcloud config set project <your-gcp-project-id>`
+4. **Configure Google Cloud Authentication**:
+   There are two ways to authenticate with Google Cloud:
+
+   a) **User Account Authentication**:
+   * Ensure you have the Google Cloud SDK (gcloud) installed and configured
+   * Run `gcloud auth application-default login` to authenticate
+   * Set your project: `gcloud config set project <your-project-id>`
+
+   b) **Service Account Authentication**:
+   * Create a service account with appropriate permissions (Owner/Editor)
+   * Download the service account key JSON file
+   * Set the environment variable: `export GOOGLE_APPLICATION_CREDENTIALS="path/to/your/service-account-key.json"`
+   * Alternatively, you can specify the credentials file path in your Terraform provider configuration:
+     ```hcl
+     provider "google" {
+       credentials = file("path/to/your/service-account-key.json")
+       project     = "<your-project-id>"
+     }
+     ```
+
+   Note: 
+   * Ensure that Organization Policy is not disabled to create service account and associated Service Account Key
+   * Ensure that the user or service account performing terraform has the permissions to access Google Cloud resources. While not recommended but roles like `roles/editor` or `roles/owner` should ensure all tasks completes successfully
 
 5. **Required Tools**:
    - Terraform >= 1.0.0

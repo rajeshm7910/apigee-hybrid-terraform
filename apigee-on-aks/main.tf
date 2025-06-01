@@ -45,7 +45,7 @@ locals {
 }
 
 # Ensure the output directory exists for kubeconfig
-resource "null_resource" "create_aks_output_dir" {
+resource "null_resource" "create_output_dir" {
   triggers = {
     output_dir_path = local.output_dir
   }
@@ -199,19 +199,18 @@ resource "azurerm_role_assignment" "aks_subnet_join_permission" {
 }
 
 
+# Generate kubeconfig for AKS
+resource "local_file" "kubeconfig" {
+  content  = azurerm_kubernetes_cluster.aks.kube_config_raw # Use the raw kubeconfig directly
+  filename = "${path.module}/output/${var.gcp_project_id}/apigee-kubeconfig"
+  file_permission = "0600"
 
-resource "null_resource" "cluster_setup" {
-  # Use local-exec provisioner to run a script to configure kubectl
-  provisioner "local-exec" {
-    command = "az aks get-credentials --resource-group ${local.resource_group_name} --name ${local.cluster_name} --overwrite-existing"
-  }
   depends_on = [
-    azurerm_kubernetes_cluster_node_pool.runtime,
-    azurerm_kubernetes_cluster_node_pool.data,
-    azurerm_kubernetes_cluster.aks,
-    azurerm_role_assignment.aks_subnet_join_permission # Add dependency here
+    null_resource.create_output_dir, # Ensure directory exists
+    azurerm_kubernetes_cluster.aks
   ]
 }
+
 
 
 # Call the apigee-hybrid-core module
@@ -228,6 +227,8 @@ module "apigee_core" { # Renamed module instance for clarity
   apigee_envgroup_hostnames   = var.hostnames # Core module expects 'apigee_envgroup_hostnames'
   apigee_instance_name        = "aks-${local.name_suffix}" # A name for the Apigee instance resource
   cluster_name                = local.cluster_name         # Pass AKS cluster name to core module
+  kubeconfig                  = abspath("${local_file.kubeconfig.filename}") # Pass the kubeconfig file path to core module
+
   apigee_version              = var.apigee_version
   apigee_namespace            = var.apigee_namespace
   apigee_cassandra_replica_count = var.apigee_cassandra_replica_count
@@ -253,17 +254,6 @@ module "apigee_core" { # Renamed module instance for clarity
     azurerm_kubernetes_cluster.aks, # Ensure AKS is ready before Apigee core module attempts anything K8s related
     azurerm_kubernetes_cluster_node_pool.runtime,
     azurerm_kubernetes_cluster_node_pool.data,
-    null_resource.cluster_setup, # Ensure cluster setup is done before Apigee install
+    local_file.kubeconfig # Ensure kubeconfig is generated before Apigee tries to use it
   ]
-}
-
-# Generate kubeconfig
-resource "local_file" "kubeconfig" {
-  content  = azurerm_kubernetes_cluster.aks.kube_config_raw
-  filename = "${local.output_dir}/kubeconfig"
-
-  depends_on = [
-    azurerm_kubernetes_cluster.aks,
-    null_resource.create_aks_output_dir,
-    ]
 }

@@ -25,6 +25,13 @@ variable "apigee_env_name" {
   default     = "dev"
 }
 
+variable "kubeconfig" {
+  description = "Path to the Kubernetes configuration file."
+  type        = string
+  default     = ""
+}
+
+
 variable "apigee_env_display_name" {
   description = "Display name for the Apigee Environment."
   type        = string

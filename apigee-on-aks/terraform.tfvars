@@ -20,7 +20,7 @@ hostnames = [
 ]
 
 create_org=true
-apigee_install=true
+apigee_install=false
 
 
 # Ingress Configuration

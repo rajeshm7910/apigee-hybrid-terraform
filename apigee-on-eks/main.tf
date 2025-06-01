@@ -138,14 +138,53 @@ resource "aws_eks_addon" "ebs_csi" {
   depends_on = [module.irsa-ebs-csi]
 }
 
-resource "null_resource" "cluster_setup" {
-  # Use local-exec provisioner to run a script to configure kubectl
+# Create output directory if it doesn't exist
+resource "null_resource" "create_output_dir" {
   provisioner "local-exec" {
-    command = "aws eks update-kubeconfig --name ${local.cluster_name} --region ${var.eks_region}"
+    command = "mkdir -p ${path.module}/output/${var.project_id}"
   }
-
-  depends_on = [module.eks, aws_eks_addon.ebs_csi]
 }
+
+# Generate kubeconfig for EKS
+resource "local_file" "kubeconfig" {
+  content  = <<-KUBECONFIG
+    apiVersion: v1
+    kind: Config
+    current-context: ${module.eks.cluster_name}
+    contexts:
+    - context:
+        cluster: ${module.eks.cluster_name}
+        user: ${module.eks.cluster_name}
+      name: ${module.eks.cluster_name}
+    clusters:
+    - cluster:
+        certificate-authority-data: ${base64encode(module.eks.cluster_certificate_authority_data)}
+        server: ${module.eks.cluster_endpoint}
+      name: ${module.eks.cluster_name}
+    users:
+    - name: ${module.eks.cluster_name}
+      user:
+        exec:
+          apiVersion: client.authentication.k8s.io/v1beta1
+          command: aws
+          args:
+          - eks
+          - get-token
+          - --cluster-name
+          - ${module.eks.cluster_name}
+          - --region
+          - ${var.eks_region}
+  KUBECONFIG
+  filename = "${path.module}/output/${var.project_id}/apigee-kubeconfig"
+  file_permission = "0600"
+
+  depends_on = [
+    null_resource.create_output_dir,
+    module.eks
+  ]
+}
+
+
 
 # Add Apigee Hybrid module
 module "apigee_hybrid" {
@@ -159,6 +198,8 @@ module "apigee_hybrid" {
   apigee_namespace         = var.apigee_namespace
   apigee_version           = var.apigee_version
   cluster_name             = local.cluster_name
+  kubeconfig               = abspath("${local_file.kubeconfig.filename}") # Pass the kubeconfig file path to core module
+
   
   apigee_org_display_name  = var.apigee_org_display_name
   apigee_env_display_name  = var.apigee_env_display_name
@@ -176,6 +217,6 @@ module "apigee_hybrid" {
   depends_on = [
     module.eks,
     aws_eks_addon.ebs_csi,
-    null_resource.cluster_setup
+    local_file.kubeconfig,
   ]
 }

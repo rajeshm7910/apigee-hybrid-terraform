@@ -21,6 +21,11 @@ output "cluster_name" {
   value       = module.eks.cluster_name
 }
 
+output "eks_kubeconfig_path" {
+  description = "Path to the generated kubeconfig file."
+  value       = local_file.kubeconfig.filename
+}
+
 output "apigee_hybrid_non_prod_sa_email" {
   description = "Email of the Apigee Non-Prod service account from the core module."
   value       = module.apigee_hybrid.apigee_non_prod_sa_email

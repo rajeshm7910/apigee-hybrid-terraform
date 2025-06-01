@@ -38,11 +38,29 @@ Once the terraform provisions the GKE infrastructure, it proceeds to create Apig
 1. **Setup a Google Cloud Project** if you don't have one. You can create one in the [Google Cloud Console](https://console.cloud.google.com/).
 
 2. **Configure Google Cloud Authentication**:
+   There are two ways to authenticate with Google Cloud:
+
+   a) **User Account Authentication**:
    * Ensure you have the Google Cloud SDK (gcloud) installed and configured
-   * Run `gcloud auth application-default login` to authenticate
-   * Optional: Set your project: `gcloud config set project <your-project-id>`
+   * Run `gcloud auth login` to authenticate the client
+   * Run `gcloud auth application-default login` for aut
+   * Set your project: `gcloud config set project <your-project-id>`
+
+   b) **Service Account Authentication**:
+   * Create a service account with appropriate permissions (Owner/Editor)
+   * Download the service account key JSON file
+   * Set the environment variable: `export GOOGLE_APPLICATION_CREDENTIALS="path/to/your/service-account-key.json"`
+   * Alternatively, you can specify the credentials file path in your Terraform provider configuration:
+     ```hcl
+     provider "google" {
+       credentials = file("path/to/your/service-account-key.json")
+       project     = "<your-project-id>"
+     }
+     ```
+
+   Note: 
    * Ensure that Organization Policy is not disabled to create service account and associated Service Account Key
-   * Ensure that the user performing terraform has the permissions to access Google Cloud resources. While not recommended but roles like `roles/editor` or `roles/owner` should ensure all tasks completes successfully
+   * Ensure that the user or service account performing terraform has the permissions to access Google Cloud resources. While not recommended but roles like `roles/editor` or `roles/owner` should ensure all tasks completes successfully
 
 3. **Download and install Terraform** to your local terminal as described [here](https://developer.hashicorp.com/terraform/install).
 
