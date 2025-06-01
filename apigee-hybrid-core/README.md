@@ -26,6 +26,7 @@ The script accepts the following parameters:
 |-----------|-------|----------|---------|-------------|
 | `--version` | `-v` | No | 1.14.2-hotfix.1 | Apigee version to install |
 | `--namespace` | `-n` | No | apigee | Kubernetes namespace for Apigee components |
+| `--kubeconfig` | `-f` | No | - | Kubernetes Config File |
 | `--sa_email` | `-a` | Yes | - | Service Account email |
 | `--overrides` | `-o` | Yes | - | Path to overrides.yaml file |
 | `--service` | `-s` | Yes | - | Path to service template file |
@@ -42,6 +43,7 @@ The script accepts the following parameters:
    ./setup_apigee.sh \
      --version "1.14.2-hotfix.1" \
      --namespace "apigee-prod" \
+     --kubeconfig "/path/to/kubeconfig" \
      --sa_email "apigee-svc-tf@project.gserviceaccount.com" \
      --overrides "/path/to/overrides.yaml" \
      --service "/path/to/service.yaml" \
@@ -55,6 +57,7 @@ The script accepts the following parameters:
    ./setup_apigee.sh \
      -v "1.14.2-hotfix.1" \
      -n "apigee" \
+     -f "/path/to/kubeconfig" \
      -a "apigee-svc-tf@project.gserviceaccount.com" \
      -o "/path/to/overrides.yaml" \
      -s "/path/to/service.yaml" \

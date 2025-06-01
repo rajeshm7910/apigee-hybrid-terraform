@@ -10,7 +10,7 @@ usage() {
     echo "Options:"
     echo "  -v, --version VERSION        Apigee version (default: $APIGEE_VERSION)"
     echo "  -n, --namespace NAMESPACE    Apigee namespace (default: $APIGEE_NAMESPACE)"
-    echo "  -c, --kubeconfig KUBECONFIG  Path to kubeconfig file (default: $KUBECONFIG)"
+    echo "  -f, --kubeconfig KUBECONFIG  Path to kubeconfig file (default: $KUBECONFIG)"
     echo "  -o, --overrides PATH        Path to overrides.yaml file (required)"
     echo "  -s, --service PATH          Path to apigee service template file (required)"
     echo "  -a, --sa_email SA_EMAIL      Path to apigee service accounts template file (required)"
@@ -32,7 +32,7 @@ while [[ $# -gt 0 ]]; do
             APIGEE_NAMESPACE="$2"
             shift 2
             ;;
-        -c|--kubeconfig)
+        -f|--kubeconfig)
             KUBECONFIG_FILE="$2"
             shift 2
             ;;
