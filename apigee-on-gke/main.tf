@@ -283,7 +283,6 @@ module "apigee_hybrid" {
   cluster_name             = google_container_cluster.gke.name
   kubeconfig               = abspath("${path.module}/output/${var.project_id}/apigee-kubeconfig")
   
-  create_org               = var.create_org
   apigee_org_display_name  = var.apigee_org_display_name
   apigee_env_display_name  = var.apigee_env_display_name
   apigee_instance_name     = var.apigee_instance_name
@@ -293,8 +292,16 @@ module "apigee_hybrid" {
   ingress_svc_annotations  = var.ingress_svc_annotations
   overrides_template_path = "${path.module}/../apigee-hybrid-core/overrides-templates.yaml" # Example if you want to be explicit
   service_template_path   = "${path.module}/../apigee-hybrid-core/apigee-service-template.yaml" # Example
-  apigee_install          = var.apigee_install
-  billing_type            = var.billing_type
+
+  apigee_lb_ip                = var.apigee_lb_ip
+  #TLS related variables
+  tls_apigee_self_signed      = var.tls_apigee_self_signed
+  tls_apigee_cert_path        = var.tls_apigee_cert_path
+  tls_apigee_key_path         = var.tls_apigee_key_path
+
+  create_org                  = var.create_org
+  apigee_install              = var.apigee_install
+  billing_type                = var.billing_type
 
   depends_on = [
     google_container_cluster.gke,

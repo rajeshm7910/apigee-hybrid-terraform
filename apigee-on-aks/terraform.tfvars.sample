@@ -24,6 +24,15 @@ hostnames = [
   "api-dev.example.com"
 ]
 
+#TLS related variable
+tls_apigee_self_signed = true
+tls_apigee_cert_path = "path/to/your/tls.crt"
+tls_apigee_key_path = "path/to/your/tls.key"
+
+#Load Balancer IP
+#apigee_lb_ip="35.188.116.91"
+
+
 create_org=true
 apigee_install=true
 

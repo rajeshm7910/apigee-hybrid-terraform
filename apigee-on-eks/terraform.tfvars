@@ -24,6 +24,15 @@ hostnames = [
   "api-dev.mycompany.com"        # Development API endpoint
 ]
 
+#TLS related variable
+tls_apigee_self_signed = true
+tls_apigee_cert_path = "path/to/your/tls.crt"
+tls_apigee_key_path = "path/to/your/tls.key"
+
+#Load Balancer IP
+#apigee_lb_ip="35.188.116.91"
+
+
 create_org=true
 apigee_install=true
 
@@ -31,10 +40,10 @@ apigee_install=true
 ingress_name = "apigee-ingress"
 ingress_svc_annotations = {
   # AWS-specific annotations for Network Load Balancer
-  "service.beta.kubernetes.io/aws-load-balancer-type" = "nlb"
-  "service.beta.kubernetes.io/aws-load-balancer-internal" = "true"
-  "service.beta.kubernetes.io/aws-load-balancer-scheme" = "internet-facing"
-  "service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled" = "true"
+  #"service.beta.kubernetes.io/aws-load-balancer-type" = "nlb"
+  #"service.beta.kubernetes.io/aws-load-balancer-internal" = "true"
+  #"service.beta.kubernetes.io/aws-load-balancer-scheme" = "internet-facing"
+  #"service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled" = "true"
   
   # Optional: Add these if you need SSL termination
   # "service.beta.kubernetes.io/aws-load-balancer-ssl-cert" = "arn:aws:acm:region:account:certificate/certificate-id"

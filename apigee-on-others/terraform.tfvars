@@ -21,6 +21,14 @@ hostnames = [
   "api-dev.mycompany.com"        # Development API endpoint
 ]
 
+#TLS related variable
+tls_apigee_self_signed = true
+tls_apigee_cert_path = "tls.crt"
+tls_apigee_key_path = "tls.key"
+
+#Load Balancer IP
+#apigee_lb_ip="35.188.116.91"
+
 create_org=false
 apigee_install=true
 
@@ -33,9 +41,8 @@ ingress_svc_annotations = {
   # "service.beta.kubernetes.io/aws-load-balancer-internal" = "true"
   
   # For GCP:
-  # "cloud.google.com/neg" = "{\"ingress\": true}"
-  # "cloud.google.com/load-balancer-type" = "internal"
-  
+  "networking.gke.io/load-balancer-type": "Internal"
+
   # For Azure:
   # "service.beta.kubernetes.io/azure-load-balancer-internal" = "true"
   # "service.beta.kubernetes.io/azure-load-balancer-internal-subnet" = "your-subnet-name"

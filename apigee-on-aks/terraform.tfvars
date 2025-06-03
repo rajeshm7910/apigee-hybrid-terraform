@@ -7,6 +7,7 @@ gcp_region     = "us-central1"
 
 # Apigee Configuration
 apigee_org_name      = "apigee-aks-example1"  # Same as gcp_project_id
+apigee_org_display_name = "Apigee on AKS Example"
 apigee_env_name      = "dev"
 apigee_envgroup_name = "dev-group"
 apigee_namespace     = "apigee"
@@ -19,12 +20,23 @@ hostnames = [
   "api-dev.example.com"
 ]
 
+#TLS related variable
+tls_apigee_self_signed = true
+tls_apigee_cert_path = "path/to/your/tls.crt"
+tls_apigee_key_path = "path/to/your/tls.key"
+
+#Load Balancer IP
+#apigee_lb_ip="4.156.46.192"
+
+
+#Installation Options
 create_org=true
 apigee_install=true
 
 
+
 # Ingress Configuration
-ingress_name = "apigee-ingress"
+ingress_name = "apigee-ing"
 ingress_svc_annotations = {
   # Uncomment and modify these based on your cloud provider
   # For AWS:

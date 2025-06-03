@@ -67,9 +67,7 @@ locals {
   cert_file_path_for_overrides        = basename(local_file.apigee_envgroup_cert_file.filename)
   private_key_file_path_for_overrides = basename(local_file.apigee_envgroup_private_key_file.filename)
 
-  ingress_svc_annotations_yaml = length(var.ingress_svc_annotations) > 0 ? yamlencode({
-    svcAnnotations = var.ingress_svc_annotations
-  }) : ""
+  ingress_svc_annotations_yaml = length(var.ingress_svc_annotations) > 0 ? yamlencode(var.ingress_svc_annotations) : ""
 
   # Use module path for templates if specific paths aren't provided
   final_overrides_template_path = var.overrides_template_path != "" ? var.overrides_template_path : "${path.module}/overrides-templates.yaml"
@@ -191,12 +189,14 @@ resource "local_file" "apigee_non_prod_sa_key_file" {
 # Self-Signed TLS Certificate for Apigee Environment Group Hostnames
 # ------------------------------------------------------------------------------
 resource "tls_private_key" "apigee_envgroup_key" {
+  count     = var.tls_apigee_self_signed ? 1 : 0
   algorithm = "RSA"
   rsa_bits  = 2048
 }
 
 resource "tls_self_signed_cert" "apigee_envgroup_cert" {
-  private_key_pem = tls_private_key.apigee_envgroup_key.private_key_pem
+  count           = var.tls_apigee_self_signed ? 1 : 0
+  private_key_pem = tls_private_key.apigee_envgroup_key[0].private_key_pem
   dns_names       = var.apigee_envgroup_hostnames
 
   subject {
@@ -215,9 +215,9 @@ resource "tls_self_signed_cert" "apigee_envgroup_cert" {
 }
 
 resource "local_file" "apigee_envgroup_private_key_file" {
-  sensitive_content = tls_private_key.apigee_envgroup_key.private_key_pem
-  filename          = "${local.output_dir}/${local.cert_filename_prefix}.key"
-  file_permission   = "0600"
+  sensitive_content  = var.tls_apigee_self_signed ? tls_private_key.apigee_envgroup_key[0].private_key_pem : var.tls_apigee_key_path
+  filename        = "${local.output_dir}/${local.cert_filename_prefix}.key"
+  file_permission = "0600"
   depends_on = [
     null_resource.create_output_dir,
     tls_private_key.apigee_envgroup_key,
@@ -225,7 +225,7 @@ resource "local_file" "apigee_envgroup_private_key_file" {
 }
 
 resource "local_file" "apigee_envgroup_cert_file" {
-  content         = tls_self_signed_cert.apigee_envgroup_cert.cert_pem
+  content         = var.tls_apigee_self_signed ? tls_self_signed_cert.apigee_envgroup_cert[0].cert_pem : var.tls_apigee_cert_path
   filename        = "${local.output_dir}/${local.cert_filename_prefix}.crt"
   file_permission = "0644"
   depends_on = [
@@ -335,6 +335,7 @@ resource "local_file" "apigee_service" {
     ingress_name           = var.ingress_name
     # SERVICE_NAME often maps to envgroup name or a specific service identifier
     service_name           = var.apigee_envgroup_name # Or another appropriate variable
+    apigee_lb_ip           = var.apigee_lb_ip
     # Add any other variables your template needs
   })
   filename        = "${local.output_dir}/apigee-service.yaml"
@@ -349,16 +350,16 @@ resource "null_resource" "apigee_setup_execution" {
   count = var.apigee_install ? 1 : 0
 
   triggers = {
-    apigee_version                = var.apigee_version
-    apigee_namespace              = var.apigee_namespace
-    kubeconfig                    = var.kubeconfig
-    apigee_overrides_yaml_content = local_file.apigee_overrides.content
-    apigee_service_yaml_content   = local_file.apigee_service.content
-    apigee_sa_key_json_path       = abspath(local_file.apigee_non_prod_sa_key_file.filename)
-    apigee_envgroup_cert_path     = abspath(local_file.apigee_envgroup_cert_file.filename)
-    apigee_envgroup_key_path      = abspath(local_file.apigee_envgroup_private_key_file.filename)
-    script_hash                   = filemd5("${path.module}/setup_apigee.sh")
-    output_dir                    = local.output_dir
+    apigee_version                   = var.apigee_version
+    apigee_namespace                 = var.apigee_namespace
+    kubeconfig                       = var.kubeconfig
+    apigee_overrides_yaml_content    = local_file.apigee_overrides.content
+    apigee_service_yaml_content      = local_file.apigee_service.content
+    apigee_sa_key_json_content       = local_file.apigee_non_prod_sa_key_file.content
+    apigee_envgroup_cert_content     = local_file.apigee_envgroup_cert_file.content
+    apigee_envgroup_key_content      = local_file.apigee_envgroup_private_key_file.content
+    script_hash                      = filemd5("${path.module}/setup_apigee.sh")
+    output_dir                       = local.output_dir
   }
 
   provisioner "local-exec" {

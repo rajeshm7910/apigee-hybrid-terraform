@@ -222,6 +222,14 @@ module "apigee_hybrid" {
   ingress_svc_annotations  = var.ingress_svc_annotations
   overrides_template_path  = "${path.module}/../apigee-hybrid-core/overrides-templates.yaml"
   service_template_path    = "${path.module}/../apigee-hybrid-core/apigee-service-template.yaml"
+
+  apigee_lb_ip                = var.apigee_lb_ip
+  #TLS related variables
+  tls_apigee_self_signed      = var.tls_apigee_self_signed
+  tls_apigee_cert_path        = var.tls_apigee_cert_path
+  tls_apigee_key_path         = var.tls_apigee_key_path
+
+
   apigee_install           = var.apigee_install
   create_org               = var.create_org
   billing_type             = var.billing_type

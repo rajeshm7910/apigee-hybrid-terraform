@@ -18,3 +18,4 @@ spec:
     ingress_name: ${ingress_name}
     org: ${org_name}
   type: LoadBalancer
+  loadBalancerIP: ${apigee_lb_ip}

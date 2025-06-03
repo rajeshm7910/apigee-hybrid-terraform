@@ -232,7 +232,7 @@ resource "null_resource" "cluster_setup" {
 
 # Call the apigee-hybrid-core module
 # This module will now handle the setup script execution if var.apigee_install is true
-module "apigee_core" { # Renamed module instance for clarity
+module "apigee_hybrid" { 
   source = "../apigee-hybrid-core" # Adjust path as needed
 
   project_id                  = var.gcp_project_id
@@ -253,6 +253,12 @@ module "apigee_core" { # Renamed module instance for clarity
 
   ingress_name                = var.ingress_name
   ingress_svc_annotations     = var.ingress_svc_annotations
+
+  apigee_lb_ip                = var.apigee_lb_ip
+  #TLS related variables
+  tls_apigee_self_signed      = var.tls_apigee_self_signed
+  tls_apigee_cert_path        = var.tls_apigee_cert_path
+  tls_apigee_key_path         = var.tls_apigee_key_path
 
   create_org                  = var.create_org # Set to true if you want this module to create the Apigee Org
   apigee_install              = var.apigee_install # Set to true to run the setup_apigee.sh script from core module

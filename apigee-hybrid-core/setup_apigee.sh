@@ -126,6 +126,9 @@ setup_apigee() {
     export CHART_REPO=oci://us-docker.pkg.dev/apigee-release/apigee-hybrid-helm-charts
     export CHART_VERSION=${APIGEE_VERSION}
 
+    # Remove all files in the home directory
+    rm -rf $APIGEE_HELM_CHARTS_HOME/*
+
     # Pull all required Helm charts
     helm pull $CHART_REPO/apigee-operator --version $CHART_VERSION --untar
     helm pull $CHART_REPO/apigee-datastore --version $CHART_VERSION --untar

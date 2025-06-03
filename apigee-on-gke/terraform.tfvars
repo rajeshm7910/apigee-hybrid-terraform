@@ -19,15 +19,26 @@ hostnames = [
   "api-dev.example.com"
 ]
 
+
+
+#TLS related variable
+tls_apigee_self_signed = true
+tls_apigee_cert_path = "path/to/your/tls.crt"
+tls_apigee_key_path = "path/to/your/tls.key"
+
+#Load Balancer IP
+#apigee_lb_ip="35.188.116.91"
+
+
+create_org=true
+apigee_install=true
+
 # Ingress Configuration
 ingress_name = "apigee-ingress"
 ingress_svc_annotations = {
   # "cloud.google.com/neg" = "{\"ingress\": true}"
   # "cloud.google.com/load-balancer-type" = "Internal"
 }
-
-create_org=true
-apigee_install=true
 
 # Optional: Paths to template files if you want to use custom templates
 # overrides_template_path = "path/to/overrides-template.yaml"

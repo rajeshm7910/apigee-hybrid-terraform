@@ -108,3 +108,28 @@ variable "billing_type" {
   type        = string
   default     = "EVALUATION"
 } 
+
+variable "tls_apigee_self_signed" {
+  description = "Whether to use self-signed certificates for Apigee TLS. If true, self-signed certs will be generated. If false, provide tls_apigee_cert and tls_apigee_key."
+  type        = bool
+  default     = true
+}
+
+variable "tls_apigee_cert_path" {
+  description = "The TLS certificate for Apigee. Required if tls_apigee_self_signed is false."
+  type        = string
+  default     = ""
+}
+
+variable "tls_apigee_key_path" {
+  description = "The TLS private key for Apigee. Required if tls_apigee_self_signed is false."
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "apigee_lb_ip" {
+  type        = string
+  description = "IP address for the Apigee Load Balancer."
+  default     = ""
+}
