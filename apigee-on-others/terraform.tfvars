@@ -23,8 +23,8 @@ hostnames = [
 
 #TLS related variable
 tls_apigee_self_signed = true
-tls_apigee_cert_path = "tls.crt"
-tls_apigee_key_path = "tls.key"
+#tls_apigee_cert_path = "tls.crt"
+#tls_apigee_key_path = "tls.key"
 
 #Load Balancer IP
 #apigee_lb_ip="35.188.116.91"
@@ -41,7 +41,7 @@ ingress_svc_annotations = {
   # "service.beta.kubernetes.io/aws-load-balancer-internal" = "true"
   
   # For GCP:
-  "networking.gke.io/load-balancer-type": "Internal"
+  #"networking.gke.io/load-balancer-type": "Internal"
 
   # For Azure:
   # "service.beta.kubernetes.io/azure-load-balancer-internal" = "true"
