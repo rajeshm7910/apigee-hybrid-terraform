@@ -1,26 +1,23 @@
 # Apigee Hybrid Terraform
 
-This repository contains Terraform configurations for deploying and managing Apigee Hybrid. The project supports deployment on both Google Kubernetes Engine (GKE) , Azure Kubernetes Service (AKS), Elastic Kubernetes Service (EKS) and Supported Kubernetes Platforms. The purpose is to create a evaluation Apigee instance to test the feature.
-
+This repository contains Terraform configurations for deploying and managing Apigee Hybrid. The project supports deployment on multiple Kubernetes platforms including Google Kubernetes Engine (GKE), Azure Kubernetes Service (AKS), Elastic Kubernetes Service (EKS), and other supported Kubernetes platforms. This setup is ideal for creating an evaluation Apigee instance to test features and functionality.
 
 ## Project Structure
 
 ```
-.
-├── apigee-hybrid-core/     # Core Apigee Hybrid infrastructure components
+├── apigee-hybrid-core/    # Core Apigee Hybrid infrastructure components
 ├── apigee-on-aks/         # AKS-specific deployment configurations
 ├── apigee-on-gke/         # GKE-specific deployment configurations
 ├── apigee-on-eks/         # EKS-specific deployment configurations
-├── apigee-on-others/      # Install Apigee on other Kubernetes Provider/Access to kubecontext
-└── diagram/               # Architecture diagrams and documentation
+├── apigee-on-others/      # Install Apigee on other Kubernetes Provider/
 ```
 
 ## Prerequisites
 
 ### Required Tools
 - Terraform >= 1.0.0
-- Google Cloud SDK (gcloud CLI)
-- kubectl
+- Google Cloud SDK (gcloud CLI) >= 400.0.0
+- kubectl >= 1.24.0
 - Helm >= 3.15.0
 
 ### GCP Project Setup
@@ -34,6 +31,10 @@ This repository contains Terraform configurations for deploying and managing Api
   - Apigee Connect API
   - Cloud KMS API
   - Service Networking API
+  - Cloud Monitoring API
+  - Cloud Logging API
+  - Cloud Storage API
+  - Cloud SQL Admin API
 
 ### Organization Policies
 The following organization policies should use Google's default settings:
@@ -46,7 +47,6 @@ To apply these policies, run:
 ```bash
 ./apply_org_policies.sh
 ```
-
 
 ## Quick Start
 
@@ -75,6 +75,11 @@ To apply these policies, run:
    ```bash
    terraform plan
    terraform apply
+   ```
+
+6. Verify the deployment:
+   ```bash
+   kubectl get pods -n apigee
    ```
 
 ## Components
@@ -123,13 +128,31 @@ Configurations for deploying Apigee Hybrid on other Kubernetes Service, includin
 
 1. Review the release notes for the target version
 2. Update the Apigee runtime version in your configuration
-3. Apply the changes using Terraform
+3. Apply the changes using Terraform:
+   ```bash
+   terraform plan
+   terraform apply
+   ```
+4. Verify the upgrade:
+   ```bash
+   kubectl get pods -n apigee
+   ```
 
 ### Backup and Recovery
 
 - Regular backups of the Apigee runtime data
 - Terraform state backup
 - Configuration version control
+- Disaster recovery procedures
+
+### Health Checks
+
+Regular health checks should be performed:
+```bash
+kubectl get pods -n apigee
+kubectl get services -n apigee
+kubectl describe pods -n apigee
+```
 
 ## Known Issues and Solutions
 
@@ -161,30 +184,26 @@ Configurations for deploying Apigee Hybrid on other Kubernetes Service, includin
    - **Solution**: 
      1. Remove the service account from GCP Project
      2. Reapply the terraform configuration 'terraform apply'
-### Workarounds
 
-For immediate workarounds:
-1. Use `terraform apply -refresh=false` to skip refresh
-2. If issues persist, try:
-   ```bash
-   terraform state rm [resource_address]
-   terraform import [resource_address] [resource_id]
-   terraform apply
-   ```
-
-## Troubleshooting
-
-Common issues and their solutions:
+### Common Issues
 
 1. **Cluster Creation Fails**
    - Check IAM permissions
    - Verify quota availability
    - Review network configurations
+   - Check resource limits
 
 2. **Apigee Runtime Issues**
    - Check pod status: `kubectl get pods -n apigee`
    - Review logs: `kubectl logs -n apigee`
    - Verify connectivity to Apigee control plane
+   - Check resource constraints
+
+3. **Network Connectivity Issues**
+   - Verify VPC configurations
+   - Check firewall rules
+   - Validate DNS settings
+   - Review load balancer configuration
 
 ## Contributing
 
@@ -194,6 +213,12 @@ Common issues and their solutions:
 4. Push to the branch
 5. Create a Pull Request
 
+### Development Guidelines
+- Follow Terraform best practices
+- Include documentation for new features
+- Add tests for new functionality
+- Update version numbers appropriately
+
 ## License
 
 This project is licensed under the terms of the license included in the repository.
@@ -202,9 +227,18 @@ This project is licensed under the terms of the license included in the reposito
 
 For issues and feature requests, please create an issue in the GitHub repository.
 
+### Getting Help
+- Check the [FAQ](docs/FAQ.md)
+- Review the [troubleshooting guide](docs/TROUBLESHOOTING.md)
+- Join the community Slack channel
+- Contact the maintainers
+
 ## Additional Resources
 
 - [Apigee Hybrid Documentation](https://cloud.google.com/apigee/docs/hybrid)
 - [Terraform Documentation](https://www.terraform.io/docs)
 - [GKE Documentation](https://cloud.google.com/kubernetes-engine/docs)
 - [AKS Documentation](https://docs.microsoft.com/azure/aks)
+- [EKS Documentation](https://docs.aws.amazon.com/eks)
+- [Kubernetes Documentation](https://kubernetes.io/docs)
+- [Helm Documentation](https://helm.sh/docs)
