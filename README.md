@@ -91,7 +91,7 @@ The core module provides the fundamental infrastructure components required for 
 - Service accounts
 - Core GCP resources
 
-### GKE Deployment (`apigee-on-gke/`)
+### GKE Deployment ([`apigee-on-gke/`](apigee-on-gke/))
 
 Specific configurations for deploying Apigee Hybrid on Google Kubernetes Engine, including:
 - GKE cluster configuration
@@ -99,7 +99,7 @@ Specific configurations for deploying Apigee Hybrid on Google Kubernetes Engine,
 - Network configurations
 - Load balancer setup
 
-### AKS Deployment (`apigee-on-aks/`)
+### AKS Deployment ([`apigee-on-aks/`](apigee-on-aks/))
 
 Configurations for deploying Apigee Hybrid on Azure Kubernetes Service, including:
 - AKS cluster setup
@@ -108,7 +108,7 @@ Configurations for deploying Apigee Hybrid on Azure Kubernetes Service, includin
 - Apigee Runtime Installation
 
 
-### EKS Deployment (`apigee-on-eks/`)
+### EKS Deployment ([`apigee-on-eks/`](apigee-on-eks/))
 
 Configurations for deploying Apigee Hybrid on AWS Kubernetes Service, including:
 - EKS cluster setup
@@ -116,7 +116,7 @@ Configurations for deploying Apigee Hybrid on AWS Kubernetes Service, including:
 - Load balancer setup
 - Apigee Runtime Installation
 
-### Other K8s Deployment (`apigee-on-others/`)
+### Other K8s Deployment ([`apigee-on-others/`](apigee-on-others/))
 
 Configurations for deploying Apigee Hybrid on other Kubernetes Service, including:
 
