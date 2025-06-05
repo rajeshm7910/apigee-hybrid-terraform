@@ -45,7 +45,16 @@ Once the terraform provisions the aks infrastructure, it proceeds to create Apig
 3.  **Download and install Terraform** to your local terminal as described [here](https://developer.hashicorp.com/terraform/install).
 4.  **Download and install the Azure CLI (az)** to your local terminal from where Terraform would be run, as described [here](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli).
 5.  **Download and install Helm** (version 3.10+ recommended, check Apigee docs for specific version compatibility).
-6.  Run `terraform init` to initialize Terraform and download necessary providers.
+6.  **Install kubectl**:
+    ```bash
+    # Check if kubectl is installed
+    kubectl version --client
+    
+    # If not installed, follow instructions at:
+    # https://kubernetes.io/docs/tasks/tools/install-kubectl/
+    # Ensure version 1.29 or higher
+    ```
+7.  Run `terraform init` to initialize Terraform and download necessary providers.
 
 ## Setup Steps
 
@@ -88,11 +97,10 @@ Once the terraform provisions the aks infrastructure, it proceeds to create Apig
 3.  **Customize the Terraform configuration files**:
     *   Review `main.tf` (and any module files) to adjust Azure resource definitions like VNet address spaces, AKS cluster version, node pool configurations (VM sizes, count, taints, labels for Apigee workloads).
     *   Update `terraform.tfvars` file (or create one, e.g., `terraform.tfvars`) with your specific values (e.g., Azure region and Apigee Organization etc).
-    *   Set `create_org=true` if you want the script to create Apigee organization for you.
-    *   Set `apigee_install=true` if you want the script to install Apigee Hybrid for you.
-    *   Ensure your Terraform configuration outputs key values like `resource_group_name` and `aks_cluster_name` which will be used later.
 
 #### **terraform.tfvars Variable Reference**
+
+**Descriptions for each variable** listed below the table for more detail.
 
 | Variable | Description | Example/Default |
 |----------|-------------|----------------|
@@ -116,7 +124,6 @@ Once the terraform provisions the aks infrastructure, it proceeds to create Apig
 | `ingress_name` | Name for ingress resource | `"apigee-ing"` |
 | `ingress_svc_annotations` | Service annotations for LB (cloud-specific) | `{}` |
 
-**Descriptions for each variable** (as previously provided) can be included below the table for more detail.
 
 4.  **Run `terraform plan`**:
     Validate the list of Azure resources to be created. The exact count will vary based on your configuration. Review the plan carefully to ensure it matches your expectations.
