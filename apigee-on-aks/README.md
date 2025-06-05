@@ -44,7 +44,16 @@ Once the terraform provisions the aks infrastructure, it proceeds to create Apig
 3.  **Download and install Terraform** to your local terminal as described [here](https://developer.hashicorp.com/terraform/install).
 4.  **Download and install the Azure CLI (az)** to your local terminal from where Terraform would be run, as described [here](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli).
 5.  **Download and install Helm** (version 3.10+ recommended, check Apigee docs for specific version compatibility).
-6.  **Install kubectl**:
+6. **Install Google Cloud SDK**:
+   ```bash
+   # Check if gcloud is installed
+   gcloud version
+
+   # If not installed, follow instructions at:
+   # https://cloud.google.com/sdk/docs/install
+   # Ensure you have the latest version
+   ```
+7.  **Install kubectl**:
     ```bash
     # Check if kubectl is installed
     kubectl version --client
@@ -53,7 +62,7 @@ Once the terraform provisions the aks infrastructure, it proceeds to create Apig
     # https://kubernetes.io/docs/tasks/tools/install-kubectl/
     # Ensure version 1.29 or higher
     ```
-7.  Run `terraform init` to initialize Terraform and download necessary providers.
+8.  Run `terraform init` to initialize Terraform and download necessary providers.
 
 ## Setup Steps
 
