@@ -30,7 +30,7 @@ The following diagram illustrates the architecture of Apigee Hybrid on Azure AKS
     # https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
     # Ensure you have the latest version
     ```
-5.  **Download and install Helm** (version 3.10+ recommended, check Apigee docs for specific version compatibility).
+5.  **Download and install Helm** (version 3.15+ recommended, check Apigee docs for specific version compatibility).
 6. **Install Google Cloud SDK**:
    ```bash
    # Check if gcloud is installed

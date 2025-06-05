@@ -43,7 +43,7 @@ Once the terraform provisions the aks infrastructure, it proceeds to create Apig
     
 3.  **Download and install Terraform** to your local terminal as described [here](https://developer.hashicorp.com/terraform/install).
 4.  **Download and install the Azure CLI (az)** to your local terminal from where Terraform would be run, as described [here](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli).
-5.  **Download and install Helm** (version 3.10+ recommended, check Apigee docs for specific version compatibility).
+5.  **Download and install Helm** (version 3.15+ recommended, check Apigee docs for specific version compatibility).
 6. **Install Google Cloud SDK**:
    ```bash
    # Check if gcloud is installed

@@ -64,20 +64,68 @@ Once the terraform provisions the GKE infrastructure, it proceeds to create Apig
    * Ensure that Organization Policy is not disabled to create service account and associated Service Account Key
    * Ensure that the user or service account performing terraform has the permissions to access Google Cloud resources. While not recommended but roles like `roles/editor` or `roles/owner` should ensure all tasks completes successfully
 
-3. **Download and install Terraform** to your local terminal as described [here](https://developer.hashicorp.com/terraform/install).
+3.  **Download and install Helm** (version 3.15+ recommended, check Apigee docs for specific version compatibility).
+4. **Install Google Cloud SDK**:
+   ```bash
+   # Check if gcloud is installed
+   gcloud version
 
-4. **Download and install Helm** (version 3.10+ recommended, check Apigee docs for specific version compatibility).
+   # If not installed, follow instructions at:
+   # https://cloud.google.com/sdk/docs/install
+   # Ensure you have the latest version
+   ```
+5.  **Install kubectl**:
+    ```bash
+    # Check if kubectl is installed
+    kubectl version --client
+    
+    # If not installed, follow instructions at:
+    # https://kubernetes.io/docs/tasks/tools/install-kubectl/
+    # Ensure version 1.29 or higher
+    ```
+6.  Run `terraform init` to initialize Terraform and download necessary providers.
 
-5. Run `terraform init` to initialize Terraform and download necessary providers.
 
 ## Pre-Cluster Setup Steps
 
 1. **Customize the Terraform configuration files**:
-   * Review `main.tf` and `variables.tf` to adjust GCP resource definitions like VPC network, GKE cluster version, node pool configurations (machine types, count, taints, labels for Apigee workloads)
-   * Update `terraform.tfvars` file with your specific values (e.g., GCP region, project ID and other details)
-   *   Set `create_org=true` if you want the script to create Apigee organization for you.
-   *   Set `apigee_install=true` if you want the script to install Apigee Hybrid for you.
-   * Ensure your Terraform configuration outputs key values like `project_id` and `cluster_name` which will be used later
+   Review and update the `terraform.tfvars` file with your specific values. Below is a table of all supported variables, their descriptions, and example/default values:
+
+    | Variable Name                  | Description                                                                 | Example/Default Value                |
+    |--------------------------------|-----------------------------------------------------------------------------|--------------------------------------|
+    | project_id                     | The GCP project ID                                                          | "apigee-eks-example2"               |
+    | region                         | The GCP region for resources                                                | "us-west1"                          |
+    | apigee_org_name                | The name of the Apigee organization                                         | "apigee-eks-example2"               |
+    | apigee_env_name                | The name of the Apigee environment                                          | "dev"                               |
+    | apigee_envgroup_name           | The name of the Apigee environment group                                    | "dev-group"                         |
+    | cluster_name                   | Name of the EKS cluster                                                     | "apigee-eks"                        |
+    | apigee_namespace               | Kubernetes namespace for Apigee components                                  | "apigee"                            |
+    | apigee_version                 | Apigee Hybrid version                                                       | "1.14.2-hotfix.1"                   |
+    | apigee_org_display_name        | Display name for the Apigee organization                                    | "My Company Apigee Organization"    |
+    | apigee_env_display_name        | Display name for the Apigee environment                                     | "Development Environment"           |
+    | apigee_instance_name           | Name of the Apigee instance                                                 | "apigee-instance"                   |
+    | apigee_cassandra_replica_count | Number of Cassandra replicas (recommended: 3 for production)                | 3                                    |
+    | hostnames                      | List of hostnames for the Apigee environment group                          | ["api.mycompany.com", "api-dev.mycompany.com"] |
+    | tls_apigee_self_signed         | Use self-signed certificates for Apigee TLS (true/false)                    | true                                 |
+    | tls_apigee_cert_path           | Path to your TLS certificate (if not self-signed)                           | "path/to/your/tls.crt"              |
+    | tls_apigee_key_path            | Path to your TLS private key (if not self-signed)                           | "path/to/your/tls.key"              |
+    | apigee_lb_ip                   | IP address for the Apigee Load Balancer (optional, usually auto-assigned)   | ""                                   |
+    | create_org                     | Whether to create a new Apigee organization (true/false)                    | true                                 |
+    | apigee_install                 | Whether to install Apigee components (true/false)                           | true                                 |
+    | ingress_name                   | Name of the ingress                                                         | "apigee-ingress"                    |
+    | ingress_svc_annotations        | Annotations for the ingress service (map)                                   | { ... }                              |
+    | overrides_template_path        | Path to the overrides template file (optional)                              | "../apigee-hybrid-core/overrides-templates.yaml" |
+    | service_template_path          | Path to the service template file (optional)                                | "../apigee-hybrid-core/apigee-service-template.yaml" |
+    | billing_type                   | The billing type for the Apigee organization                                | "EVALUATION" or "PAID"             |
+
+    > **Tip:** You can copy `terraform.tfvars.sample` to `terraform.tfvars` and edit it with your values.
+
+    Example:
+    ```hcl
+    project_id = "apigee-eks-example2"
+    region     = "us-west1"
+    apigee_org_name = "apigee-eks-example2"
+    # ...
 
 2. **Run `terraform plan`**:
    Validate the list of GCP resources to be created. Review the plan carefully to ensure it matches your expectations.
