@@ -1,17 +1,17 @@
 ## Disclaimer
 This tool is open-source software. It is not an officially supported Google product. It is not a part of Apigee, or any other officially supported Google Product.
 
-## Architecture
+## How to Setup Apigee hybrid on AWS EKS Clusters using Terraform 
+
+The terraform configuration defines a new VPC in which to provision the cluster, and uses the public EKS module to create the required resources, including Auto Scaling Groups, security groups, and IAM Roles and Policies.
+Open the main.tf file to review the module configuration. The eks_managed_node_groups parameter configures the cluster with three nodes across two node groups.  
+
+### Architecture
 
 The following diagram illustrates the architecture of Apigee Hybrid on Azure AKS:
 
 ![Apigee Hybrid on EKS Architecture](Images/aws-objects.png)
 
-
-## How to Setup Apigee hybrid on AWS EKS Clusters using Terraform 
-
-The terraform configuration defines a new VPC in which to provision the cluster, and uses the public EKS module to create the required resources, including Auto Scaling Groups, security groups, and IAM Roles and Policies.
-Open the main.tf file to review the module configuration. The eks_managed_node_groups parameter configures the cluster with three nodes across two node groups.  
 
 
 ## Getting Started
