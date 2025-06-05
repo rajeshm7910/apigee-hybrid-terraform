@@ -12,12 +12,32 @@ Open the main.tf file to review the module configuration. The eks_managed_node_g
 
 ## Getting Started
 
-Setup an AWS Account if you dont have one as described [here](https://aws.amazon.com/free/?gclid=Cj0KCQiA4fi7BhC5ARIsAEV1YibM5aQfcEpKMPjPwUGl-JqNl6fp9-LoTxpHhH2RFh59MFc1_yETcCQaAmHGEALw_wcB&trk=c8882cbf-4c23-4e67-b098-09697e14ffd9&sc_channel=ps&ef_id=Cj0KCQiA4fi7BhC5ARIsAEV1YibM5aQfcEpKMPjPwUGl-JqNl6fp9-LoTxpHhH2RFh59MFc1_yETcCQaAmHGEALw_wcB:G:s&s_kwcid=AL!4422!3!453053794281!e!!g!!create%20aws%20account!10706954804!104359293503&all-free-tier.sort-by=item.additionalFields.SortRank&all-free-tier.sort-order=asc&awsf.Free%20Tier%20Types=*all&awsf.Free%20Tier%20Categories=*all)  
-Create an IAM user and a cli user described [here](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html) ( we would use the cli user credentials when configuring our aws cli)  
-Download and install terraform to your local terminal described [here](https://developer.hashicorp.com/terraform/install)  
-Download and install the awscli to your local terminal from where terraform would be run described [here](https://docs.aws.amazon.com/cli/v1/userguide/cli-chap-install.html)  
-Download and install helm  ( version 3.16.2+)  
-Run terraform init to initialise terraform  
+1. **Setup an AWS Account** if you dont have one as described [here](https://aws.amazon.com/free/?gclid=Cj0KCQiA4fi7BhC5ARIsAEV1YibM5aQfcEpKMPjPwUGl-JqNl6fp9-LoTxpHhH2RFh59MFc1_yETcCQaAmHGEALw_wcB&trk=c8882cbf-4c23-4e67-b098-09697e14ffd9&sc_channel=ps&ef_id=Cj0KCQiA4fi7BhC5ARIsAEV1YibM5aQfcEpKMPjPwUGl-JqNl6fp9-LoTxpHhH2RFh59MFc1_yETcCQaAmHGEALw_wcB:G:s&s_kwcid=AL!4422!3!453053794281!e!!g!!create%20aws%20account!10706954804!104359293503&all-free-tier.sort-by=item.additionalFields.SortRank&all-free-tier.sort-order=asc&awsf.Free%20Tier%20Types=*all&awsf.Free%20Tier%20Categories=*all)  
+
+2. **Create an IAM user and a cli user** As described [here](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html) ( we would use the cli user credentials when configuring our aws cli)  
+
+3.  **Download and install Terraform** to your local terminal as described [here](https://developer.hashicorp.com/terraform/install).
+4.  **Download and install the Azure CLI (az)** to your local terminal from where Terraform would be run, as described [here](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli).
+5.  **Download and install Helm** (version 3.10+ recommended, check Apigee docs for specific version compatibility).
+6. **Install Google Cloud SDK**:
+   ```bash
+   # Check if gcloud is installed
+   gcloud version
+
+   # If not installed, follow instructions at:
+   # https://cloud.google.com/sdk/docs/install
+   # Ensure you have the latest version
+   ```
+7.  **Install kubectl**:
+    ```bash
+    # Check if kubectl is installed
+    kubectl version --client
+    
+    # If not installed, follow instructions at:
+    # https://kubernetes.io/docs/tasks/tools/install-kubectl/
+    # Ensure version 1.29 or higher
+    ```
+8.  Run `terraform init` to initialize Terraform and download necessary providers.
 
 
 ## Pre-Cluster Setup Steps  
@@ -54,10 +74,46 @@ Run terraform init to initialise terraform
 
 
 3.  **Customize the Terraform configuration files**:
-    *   Review `main.tf` (and any module files) to adjust your worker nodes and labels.
-    *   Update `terraform.tfvars` file (or create one, e.g., `terraform.tfvars`) with your specific values (e.g., eks region and Apigee Organization etc).
-    *   Set `create_org=true` if you want the script to create Apigee organization for you.
-    *   Set `apigee_install=true` if you want the script to install Apigee Hybrid for you.
+    
+    Review and update the `terraform.tfvars` file with your specific values. Below is a table of all supported variables, their descriptions, and example/default values:
+
+    | Variable Name                  | Description                                                                 | Example/Default Value                |
+    |--------------------------------|-----------------------------------------------------------------------------|--------------------------------------|
+    | eks_region                     | AWS region for EKS cluster                                                  | "us-west-1"                         |
+    | project_id                     | The GCP project ID                                                          | "apigee-eks-example2"               |
+    | region                         | The GCP region for resources                                                | "us-west1"                          |
+    | apigee_org_name                | The name of the Apigee organization                                         | "apigee-eks-example2"               |
+    | apigee_env_name                | The name of the Apigee environment                                          | "dev"                               |
+    | apigee_envgroup_name           | The name of the Apigee environment group                                    | "dev-group"                         |
+    | cluster_name                   | Name of the EKS cluster                                                     | "apigee-eks"                        |
+    | apigee_namespace               | Kubernetes namespace for Apigee components                                  | "apigee"                            |
+    | apigee_version                 | Apigee Hybrid version                                                       | "1.14.2-hotfix.1"                   |
+    | apigee_org_display_name        | Display name for the Apigee organization                                    | "My Company Apigee Organization"    |
+    | apigee_env_display_name        | Display name for the Apigee environment                                     | "Development Environment"           |
+    | apigee_instance_name           | Name of the Apigee instance                                                 | "apigee-instance"                   |
+    | apigee_cassandra_replica_count | Number of Cassandra replicas (recommended: 3 for production)                | 1                                    |
+    | hostnames                      | List of hostnames for the Apigee environment group                          | ["api.mycompany.com", "api-dev.mycompany.com"] |
+    | tls_apigee_self_signed         | Use self-signed certificates for Apigee TLS (true/false)                    | true                                 |
+    | tls_apigee_cert_path           | Path to your TLS certificate (if not self-signed)                           | "path/to/your/tls.crt"              |
+    | tls_apigee_key_path            | Path to your TLS private key (if not self-signed)                           | "path/to/your/tls.key"              |
+    | apigee_lb_ip                   | IP address for the Apigee Load Balancer (optional, usually auto-assigned)   | ""                                   |
+    | create_org                     | Whether to create a new Apigee organization (true/false)                    | true                                 |
+    | apigee_install                 | Whether to install Apigee components (true/false)                           | true                                 |
+    | ingress_name                   | Name of the ingress                                                         | "apigee-ingress"                    |
+    | ingress_svc_annotations        | Annotations for the ingress service (map)                                   | { ... }                              |
+    | overrides_template_path        | Path to the overrides template file (optional)                              | "../apigee-hybrid-core/overrides-templates.yaml" |
+    | service_template_path          | Path to the service template file (optional)                                | "../apigee-hybrid-core/apigee-service-template.yaml" |
+    | billing_type                   | The billing type for the Apigee organization                                | "EVALUATION" or "PAID"             |
+
+    > **Tip:** You can copy `terraform.tfvars.sample` to `terraform.tfvars` and edit it with your values.
+
+    Example:
+    ```hcl
+    project_id = "apigee-eks-example2"
+    region     = "us-west1"
+    apigee_org_name = "apigee-eks-example2"
+    # ...
+    ```
 
 4.  **Run `terraform plan`**:
     Validate the list of Azure resources to be created. The exact count will vary based on your configuration. Review the plan carefully to ensure it matches your expectations.
@@ -99,7 +155,7 @@ When you run `terraform apply`, the following sequence of events occurs:
      - Custom Resource Definitions (CRDs)
      - cert-manager
      - Apigee operator
-   - Deploys Apigee components in sequence:
+     - Deploys Apigee components in sequence:
      - Datastore (Cassandra)
      - Telemetry
      - Redis

@@ -163,23 +163,38 @@ When you run `terraform apply`, the following resources are created in sequence:
    - Both pools support auto-scaling if enabled
    - Configures appropriate VM sizes and disk sizes for each workload
 
-4. **GCP/Apigee Setup** (if enabled):
-   - Enables required Google Cloud APIs
-   - Creates a service account for Apigee with necessary IAM roles
-   - Generates and saves service account key
-   - Creates self-signed TLS certificates for Apigee environment group
-   - Generates Apigee overrides.yaml configuration file from the provided template file with mapped variables
-   - Sets up Apigee organization, environment, and environment group
-   - Creates a directory output/${PROJECT_ID} to store generated certificates, keys, overrides.yaml and apigee-service.yaml
+4. **GCP/Apigee Setup** (if `create_org=true`):
+   - Enables required Google Cloud APIs (Apigee, IAM, Compute, etc.)
+   - Creates an Apigee organization in your GCP project
+   - Sets up an Apigee environment (e.g., "dev")
+   - Creates an environment group with specified hostnames
+   - Attaches the environment to the environment group
 
-5. **Final Configuration**:
-   - Configures kubectl to connect to the new AKS cluster
-   - Installs Apigee Hybrid (using Helm) by calling setup_apigee.sh script
-   - The script unbundles all helm charts in output/${PROJECT_ID}
-   - Outputs important information like resource group name and kubeconfig
+5. **Service Account and Certificate Setup**:
+   - Creates a GCP service account for Apigee Hybrid
+   - Generates a service account key
+   - Creates self-signed TLS certificates for the environment group hostnames
+   - Saves all credentials and certificates to the `output/<project-id>` directory
+
+6. **Apigee Hybrid Installation** (if `apigee_install=true`):
+   - Creates the Apigee namespace in the EKS cluster
+   - Enables control plane access for the service account
+   - Installs required Kubernetes components:
+     - Custom Resource Definitions (CRDs)
+     - cert-manager
+     - Apigee operator
+     - Deploys Apigee components in sequence:
+     - Datastore (Cassandra)
+     - Telemetry
+     - Redis
+     - Ingress Manager
+     - Organization
+     - Environment
+     - Environment Group
+   - Sets up the ingress gateway with the specified configuration
+
 
 The entire process typically takes 15-30 minutes to complete, depending on the size of your cluster and the number of resources being created.
-
 
 
 ## Accessing the Cluster
