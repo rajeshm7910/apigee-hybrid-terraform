@@ -21,7 +21,15 @@ The following diagram illustrates the architecture of Apigee Hybrid on Azure AKS
 2. **Create an IAM user and a cli user** As described [here](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html) ( we would use the cli user credentials when configuring our aws cli)  
 
 3.  **Download and install Terraform** to your local terminal as described [here](https://developer.hashicorp.com/terraform/install).
-4.  **Download and install the Azure CLI (az)** to your local terminal from where Terraform would be run, as described [here](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli).
+4.  **Download and install the EKS CLI (aws)**:
+    ```bash
+    # Check if aws CLI is installed
+    aws --version
+
+    # If not installed, follow instructions at:
+    # https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+    # Ensure you have the latest version
+    ```
 5.  **Download and install Helm** (version 3.10+ recommended, check Apigee docs for specific version compatibility).
 6. **Install Google Cloud SDK**:
    ```bash
