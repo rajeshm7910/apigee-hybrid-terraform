@@ -92,6 +92,32 @@ Once the terraform provisions the aks infrastructure, it proceeds to create Apig
     *   Set `apigee_install=true` if you want the script to install Apigee Hybrid for you.
     *   Ensure your Terraform configuration outputs key values like `resource_group_name` and `aks_cluster_name` which will be used later.
 
+#### **terraform.tfvars Variable Reference**
+
+| Variable | Description | Example/Default |
+|----------|-------------|----------------|
+| `azure_location` | Azure region for resources | `"eastus"` |
+| `gcp_project_id` | GCP Project ID for Apigee | `"apigee-aks-example1"` |
+| `gcp_region` | GCP region for Apigee resources | `"us-central1"` |
+| `apigee_org_name` | Apigee organization name (usually same as GCP project) | `"apigee-aks-example1"` |
+| `apigee_org_display_name` | Display name for Apigee org | `"Apigee on AKS Example"` |
+| `apigee_env_name` | Apigee environment name | `"dev"` |
+| `apigee_envgroup_name` | Apigee environment group name | `"dev-group"` |
+| `apigee_namespace` | Kubernetes namespace for Apigee | `"apigee"` |
+| `apigee_version` | Apigee Hybrid version | `"1.14.2-hotfix.1"` |
+| `apigee_cassandra_replica_count` | Cassandra replica count | `1` |
+| `hostnames` | List of hostnames for Apigee env group | `["api.example.com", "api-dev.example.com"]` |
+| `tls_apigee_self_signed` | Use self-signed TLS certs (`true`/`false`) | `true` |
+| `tls_apigee_cert_path` | Path to TLS cert (if not self-signed) | `"path/to/your/tls.crt"` |
+| `tls_apigee_key_path` | Path to TLS key (if not self-signed) | `"path/to/your/tls.key"` |
+| `apigee_lb_ip` | (Optional) Static IP for LB | `"4.156.46.192"` |
+| `create_org` | Create Apigee org (`true`/`false`) | `true` |
+| `apigee_install` | Install Apigee Hybrid (`true`/`false`) | `true` |
+| `ingress_name` | Name for ingress resource | `"apigee-ing"` |
+| `ingress_svc_annotations` | Service annotations for LB (cloud-specific) | `{}` |
+
+**Descriptions for each variable** (as previously provided) can be included below the table for more detail.
+
 4.  **Run `terraform plan`**:
     Validate the list of Azure resources to be created. The exact count will vary based on your configuration. Review the plan carefully to ensure it matches your expectations.
 
