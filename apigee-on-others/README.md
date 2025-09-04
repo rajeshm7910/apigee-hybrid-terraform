@@ -26,11 +26,12 @@ This directory contains Terraform configurations for deploying Apigee Hybrid on 
    There are two ways to authenticate with Google Cloud:
 
    a) **User Account Authentication**:
+   * Operator of the terraform commands must be a owner/editor in the GCP project
    * Ensure you have the Google Cloud SDK (gcloud) installed and configured
    * Run `gcloud auth application-default login` to authenticate
    * Set your project: `gcloud config set project <your-project-id>`
 
-   b) **Service Account Authentication**:
+   b) **(Optional)Service Account Authentication**:
    * Create a service account with appropriate permissions (Owner/Editor)
    * Download the service account key JSON file
    * Set the environment variable: `export GOOGLE_APPLICATION_CREDENTIALS="path/to/your/service-account-key.json"`
@@ -48,7 +49,7 @@ This directory contains Terraform configurations for deploying Apigee Hybrid on 
    * Ensure that Organization Policy is not disabled to create service account and associated Service Account Key
    * Ensure that the user or service account performing terraform has the permissions to access Google Cloud resources. While not recommended but roles like `roles/editor` or `roles/owner` should ensure all tasks completes successfully
 
-5. **Required Tools**:
+6. **Required Tools**:
    - Terraform >= 1.0.0
    - Helm >= 3.10.0
    - kubectl
@@ -81,12 +82,20 @@ This directory contains Terraform configurations for deploying Apigee Hybrid on 
 
    ```
 
-2. **Verify Kubernetes Access**:
+2. **Set Kubernetes Context Credentials**:
+   Set kubernets context credentials for terraform to have access and perform the installation on the cluster.
+
+   for example, for an existing gke cluster run the below command.
+   ```bash
+   gcloud container clusters get-credentials hybrid-poc --region us-central1 --project hybrid-terraform-471100
+   ```
+
+3. **Verify Kubernetes Node Creation**:
    ```bash
    kubectl get nodes
    ```
 
-3. **Verify Node Pools**:
+4. **Verify Node Pools**:
    ```bash
    kubectl get nodes --show-labels
    ```
