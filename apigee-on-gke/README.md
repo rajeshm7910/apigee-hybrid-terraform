@@ -93,12 +93,12 @@ Once the terraform provisions the GKE infrastructure, it proceeds to create Apig
 
     | Variable Name                  | Description                                                                 | Example/Default Value                |
     |--------------------------------|-----------------------------------------------------------------------------|--------------------------------------|
-    | project_id                     | The GCP project ID                                                          | "apigee-eks-example2"               |
+    | project_id                     | The GCP project ID                                                          | "apigee-gke"                         |
     | region                         | The GCP region for resources                                                | "us-west1"                          |
-    | apigee_org_name                | The name of the Apigee organization                                         | "apigee-eks-example2"               |
+    | apigee_org_name                | The name of the Apigee organization                                         | "apigee-gke"                        |
     | apigee_env_name                | The name of the Apigee environment                                          | "dev"                               |
     | apigee_envgroup_name           | The name of the Apigee environment group                                    | "dev-group"                         |
-    | cluster_name                   | Name of the EKS cluster                                                     | "apigee-eks"                        |
+    | cluster_name                   | Name of the GKE cluster                                                     | "apigee-gke"                        |
     | apigee_namespace               | Kubernetes namespace for Apigee components                                  | "apigee"                            |
     | apigee_version                 | Apigee Hybrid version                                                       | "1.14.2-hotfix.1"                   |
     | apigee_org_display_name        | Display name for the Apigee organization                                    | "My Company Apigee Organization"    |
