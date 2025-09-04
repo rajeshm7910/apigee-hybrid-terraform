@@ -30,6 +30,7 @@ This directory contains Terraform configurations for deploying Apigee Hybrid on 
    * Ensure you have the Google Cloud SDK (gcloud) installed and configured
    * Run `gcloud auth application-default login` to authenticate
    * Set your project: `gcloud config set project <your-project-id>`
+   * Ensure user running terraform commands has following GCP IAM permissions Apigee Org admin, Org Admin, Editor, Project IAM Admin, Service Usage Admin, Service usage viewer
 
    b) **(Optional)Service Account Authentication**:
    * Create a service account with appropriate permissions (Owner/Editor)
