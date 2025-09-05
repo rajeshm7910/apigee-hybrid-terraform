@@ -26,11 +26,17 @@ This directory contains Terraform configurations for deploying Apigee Hybrid on 
    There are two ways to authenticate with Google Cloud:
 
    a) **User Account Authentication**:
-   * Operator of the terraform commands must be a owner/editor in the GCP project
    * Ensure you have the Google Cloud SDK (gcloud) installed and configured
    * Run `gcloud auth application-default login` to authenticate
    * Set your project: `gcloud config set project <your-project-id>`
-   * Ensure user running terraform commands has following GCP IAM permissions Apigee Org admin, Org Admin, Editor, Project IAM Admin, Service Usage Admin, Service usage viewer
+   * Create an IAM user specifically for running terraform commands with the following GCP IAM permissions
+     - Apigee Org admin
+     - Compute Admin
+     - Project IAM Admin
+     - Service Usage Admin
+     - Service Account Admin
+     - Service Account Key Admin
+     -  Kubernetes Engine Admin (Optional to view clusters)
 
    b) **(Optional)Service Account Authentication**:
    * Create a service account with appropriate permissions (Owner/Editor)
