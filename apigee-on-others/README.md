@@ -89,6 +89,11 @@ This directory contains Terraform configurations for deploying Apigee Hybrid on 
 
    ```
 
+**Note**
+In the scenario where a http Proxy is used in customer environment for egress connectivity to public endpoints, the proxy configurations can be added into the overides [file](https://github.com/rajeshm7910/apigee-hybrid-terraform/blob/main/apigee-hybrid-core/overrides-templates.yaml) 
+See configuration property [page](https://cloud.google.com/apigee/docs/hybrid/v1.15/config-prop-ref.html#httpproxy) for httpPRoxy Gateway configurations 
+
+
 2. **Set Kubernetes Context Credentials**:
    Set kubernets context credentials for terraform to have access and perform the installation on the cluster.
 
